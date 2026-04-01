@@ -63,13 +63,13 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: .
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/warehouse-management-system:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/warehouse-management-system:${{ github.sha }}
           build-args: |
-            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+            VITE_APP_API_URL=${{ secrets.VITE_APP_API_URL }}
 
       - name: Trigger Render Deploy
         env:
