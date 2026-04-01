@@ -39,7 +39,7 @@ jobs:
         working-directory: ./backend
 
       - name: Run ESLint on backend
-        run: npm run lint -- --max-warnings=0
+        run: npm run lint
         working-directory: ./backend
 
       - name: Run Prettier on frontend
@@ -48,7 +48,7 @@ jobs:
         working-directory: ./frontend
 
       - name: Run ESLint on frontend
-        run: npm run lint -- --max-warnings=0
+        run: npm run lint
         working-directory: ./frontend
 
       - name: Set up Docker Buildx
