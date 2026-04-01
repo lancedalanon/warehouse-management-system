@@ -1,14 +1,14 @@
 # Stage 1: Backend builder
 FROM node:22-bullseye-slim AS backend-builder
 
-WORKDIR /app
+WORKDIR /app/backend
 
-# Copy package files and install production deps
-COPY package*.json ./
+# Copy backend package files and install dependencies
+COPY backend/package*.json ./
 RUN npm install --production
 
 # Copy backend source code
-COPY . .
+COPY backend/ ./
 
 # Build backend (TypeScript)
 RUN npm run build
@@ -16,16 +16,16 @@ RUN npm run build
 # Stage 2: Frontend builder
 FROM node:22-bullseye-slim AS frontend-builder
 
-WORKDIR /app
+WORKDIR /app/frontend
 
-# Copy frontend source
+# Copy frontend package files and install dependencies
 COPY frontend/package*.json ./
 RUN npm install --production
 
-COPY frontend ./
+# Copy frontend source code
+COPY frontend/ ./
 
-# Use env from GitHub Actions secrets by creating .env file dynamically
-# This will be baked into build
+# Use env from GitHub Actions secrets
 ARG VITE_API_BASE_URL
 RUN echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" > .env
 
@@ -37,16 +37,16 @@ FROM node:22-bullseye-slim AS runtime
 
 WORKDIR /app
 
-# Copy backend artifacts
-COPY --from=backend-builder /app/dist ./dist
-COPY --from=backend-builder /app/node_modules ./node_modules
-COPY --from=backend-builder /app/package*.json ./
+# Copy backend build artifacts
+COPY --from=backend-builder /app/backend/dist ./dist
+COPY --from=backend-builder /app/backend/node_modules ./node_modules
+COPY --from=backend-builder /app/backend/package*.json ./
 
 # Copy frontend build into public folder
-COPY --from=frontend-builder /app/dist ./public
+COPY --from=frontend-builder /app/frontend/dist ./public
 
-# Create storage folder (committed but contents ignored)
-RUN mkdir -p storage && chmod -R 777 storage
+# Ensure backend/storage exists
+RUN mkdir -p ./storage && chmod -R 777 ./storage
 
 # Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
