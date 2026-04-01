@@ -1,7 +1,13 @@
 'use client';
 
 import { type FC, useEffect, useMemo, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { DataTable } from '@/components/DataTable';
 import type { SortState, TableColumn } from '@/types/components/data-table.types';
@@ -97,7 +103,8 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
     });
   };
 
-  const isAllSelected = items.length > 0 && items.every((item) => selectedInventories.find((i) => i.id === item.id));
+  const isAllSelected =
+    items.length > 0 && items.every((item) => selectedInventories.find((i) => i.id === item.id));
 
   const toggleSelectAll = () => {
     if (isAllSelected) {
@@ -121,13 +128,13 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
       render: (row: Inventory) => {
         const isSelected = !!selectedInventories.find((i) => i.id === row.id);
         return (
-        <div className="flex justify-center items-center h-full">
+          <div className="flex h-full items-center justify-center">
             <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => toggleInventory(row)}
-                aria-label={`Select ${row.product?.name}`}
+              checked={isSelected}
+              onCheckedChange={() => toggleInventory(row)}
+              aria-label={`Select ${row.product?.name}`}
             />
-        </div>
+          </div>
         );
       },
     },
@@ -147,7 +154,7 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
           <DialogTitle className="text-xl font-semibold">Select Items From Inventory</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col flex-1 overflow-hidden px-8 py-4 gap-4">
+        <div className="flex flex-1 flex-col gap-4 overflow-hidden px-8 py-4">
           {/* Filters */}
           <div className="flex w-full flex-wrap items-center gap-2">
             <div className="relative w-full sm:w-64">
@@ -180,30 +187,26 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
               'flex items-center justify-between rounded-lg border px-4 py-2.5 transition-all duration-200',
               selectedCount > 0
                 ? 'border-primary/30 bg-primary/5 opacity-100'
-                : 'border-transparent bg-transparent opacity-0 pointer-events-none h-0 py-0 overflow-hidden',
+                : 'pointer-events-none h-0 overflow-hidden border-transparent bg-transparent py-0 opacity-0',
             )}
           >
             <div className="flex items-center gap-2.5">
-                <Checkbox
-                    checked={isAllSelected}
-                    onCheckedChange={toggleSelectAll}
-                    aria-label="Select all on this page"
-                />
-              <PackageCheck className="size-4 text-primary" />
-              <span className="text-sm font-medium text-primary">
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={toggleSelectAll}
+                aria-label="Select all on this page"
+              />
+              <PackageCheck className="text-primary size-4" />
+              <span className="text-primary text-sm font-medium">
                 {selectedCount} item{selectedCount !== 1 ? 's' : ''} selected
               </span>
-              <div className="flex flex-wrap gap-1.5 max-w-md">
+              <div className="flex max-w-md flex-wrap gap-1.5">
                 {selectedInventories.slice(0, 3).map((inv) => (
-                  <Badge
-                    key={inv.id}
-                    variant="secondary"
-                    className="text-xs gap-1 pr-1"
-                  >
+                  <Badge key={inv.id} variant="secondary" className="gap-1 pr-1 text-xs">
                     {inv.product?.name ?? inv.product?.sku ?? `Item ${inv.id}`}
                     <button
                       onClick={() => toggleInventory(inv)}
-                      className="ml-0.5 rounded-full hover:bg-muted-foreground/20 p-0.5"
+                      className="hover:bg-muted-foreground/20 ml-0.5 rounded-full p-0.5"
                       aria-label={`Remove ${inv.product?.name}`}
                     >
                       <X className="size-2.5" />
@@ -211,7 +214,7 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
                   </Badge>
                 ))}
                 {selectedInventories.length > 3 && (
-                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                  <Badge variant="outline" className="text-muted-foreground text-xs">
                     +{selectedInventories.length - 3} more
                   </Badge>
                 )}
@@ -220,7 +223,7 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs text-muted-foreground h-7 hover:text-destructive"
+              className="text-muted-foreground hover:text-destructive h-7 text-xs"
               onClick={clearAll}
             >
               Clear all
@@ -228,7 +231,7 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
           </div>
 
           {/* Table */}
-          <ScrollArea className="flex-1 min-h-0 rounded-md border">
+          <ScrollArea className="min-h-0 flex-1 rounded-md border">
             <DataTable<Inventory>
               data={items}
               columns={columns}
@@ -266,8 +269,8 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
         </div>
 
         {/* Footer */}
-        <DialogFooter className="px-8 py-4 border-t flex items-center justify-between sm:justify-between gap-2">
-          <span className="text-sm text-muted-foreground">
+        <DialogFooter className="flex items-center justify-between gap-2 border-t px-8 py-4 sm:justify-between">
+          <span className="text-muted-foreground text-sm">
             {selectedCount > 0
               ? `${selectedCount} item${selectedCount !== 1 ? 's' : ''} ready to add`
               : 'No items selected'}
@@ -277,7 +280,11 @@ export const InventorySelectionDialog: FC<Props> = ({ open, setOpen, onAddItems 
               Back
             </Button>
             <Button onClick={handleAddItems} disabled={selectedCount === 0}>
-              Add {selectedCount > 0 ? `${selectedCount} Item${selectedCount !== 1 ? 's' : ''}` : 'Items'} to Order
+              Add{' '}
+              {selectedCount > 0
+                ? `${selectedCount} Item${selectedCount !== 1 ? 's' : ''}`
+                : 'Items'}{' '}
+              to Order
             </Button>
           </div>
         </DialogFooter>

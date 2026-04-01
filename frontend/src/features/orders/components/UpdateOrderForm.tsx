@@ -37,16 +37,10 @@ interface Props {
   resetDialog: () => void;
 }
 
-export const UpdateOrderForm: FC<Props> = ({
-  order,
-  onSuccess,
-  resetDialog,
-}) => {
+export const UpdateOrderForm: FC<Props> = ({ order, onSuccess, resetDialog }) => {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.orders);
-  const [inventoryLookup, setInventoryLookup] = useState<
-    Record<number, Inventory>
-  >({});
+  const [inventoryLookup, setInventoryLookup] = useState<Record<number, Inventory>>({});
 
   const {
     register,
@@ -70,10 +64,7 @@ export const UpdateOrderForm: FC<Props> = ({
     } as DefaultValues<UpdateOrderFormValues>,
   });
 
-  const { fields, append, remove, update } = useFieldArray<
-    UpdateOrderFormValues,
-    'items'
-  >({
+  const { fields, append, remove, update } = useFieldArray<UpdateOrderFormValues, 'items'>({
     control,
     name: 'items',
   });
@@ -137,14 +128,8 @@ export const UpdateOrderForm: FC<Props> = ({
       return;
     }
 
-    if (
-      updateOrderThunk.rejected.match(result) &&
-      Array.isArray(result.payload)
-    ) {
-      applyServerValidationErrors(
-        result.payload as ServerValidationError[],
-        setError,
-      );
+    if (updateOrderThunk.rejected.match(result) && Array.isArray(result.payload)) {
+      applyServerValidationErrors(result.payload as ServerValidationError[], setError);
     }
   };
 
@@ -152,19 +137,18 @@ export const UpdateOrderForm: FC<Props> = ({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-2 gap-6 rounded-lg border p-6">
         <div className="space-y-2">
-          <Label>Order Code <span className="text-red-500">*</span></Label>
+          <Label>
+            Order Code <span className="text-red-500">*</span>
+          </Label>
           <Input {...register('code')} />
-          {errors.code && (
-            <p className="text-red-500 text-xs">{errors.code.message}</p>
-          )}
+          {errors.code && <p className="text-xs text-red-500">{errors.code.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label>Status <span className="text-red-500">*</span></Label>
-          <select
-            {...register('status')}
-            className="w-full rounded-md border px-3 py-2"
-          >
+          <Label>
+            Status <span className="text-red-500">*</span>
+          </Label>
+          <select {...register('status')} className="w-full rounded-md border px-3 py-2">
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
             <option value="completed">Completed</option>
@@ -173,12 +157,12 @@ export const UpdateOrderForm: FC<Props> = ({
         </div>
 
         <div className="space-y-2">
-          <Label>Recipient Name <span className="text-red-500">*</span></Label>
+          <Label>
+            Recipient Name <span className="text-red-500">*</span>
+          </Label>
           <Input {...register('recipientName')} />
           {errors.recipientName && (
-            <p className="text-red-500 text-xs">
-              {errors.recipientName.message}
-            </p>
+            <p className="text-xs text-red-500">{errors.recipientName.message}</p>
           )}
         </div>
 
@@ -188,21 +172,20 @@ export const UpdateOrderForm: FC<Props> = ({
         </div>
 
         <div className="col-span-2 space-y-2">
-          <Label>Shipping Address <span className="text-red-500">*</span></Label>
+          <Label>
+            Shipping Address <span className="text-red-500">*</span>
+          </Label>
           <Input {...register('shippingAddress')} />
           {errors.shippingAddress && (
-            <p className="text-red-500 text-xs">
-              {errors.shippingAddress.message}
-            </p>
+            <p className="text-xs text-red-500">{errors.shippingAddress.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label>Priority Level <span className="text-red-500">*</span></Label>
-          <select
-            {...register('priorityLevel')}
-            className="w-full rounded-md border px-3 py-2"
-          >
+          <Label>
+            Priority Level <span className="text-red-500">*</span>
+          </Label>
+          <select {...register('priorityLevel')} className="w-full rounded-md border px-3 py-2">
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -241,27 +224,14 @@ export const UpdateOrderForm: FC<Props> = ({
         errors={errors}
       />
 
-      {errors.items && (
-        <p className="text-red-500 text-sm">
-          {errors.items.message as string}
-        </p>
-      )}
+      {errors.items && <p className="text-sm text-red-500">{errors.items.message as string}</p>}
 
       <DialogFooter>
-        <Button
-          type="button"
-          className="flex-1"
-          variant="outline"
-          onClick={() => reset()}
-        >
+        <Button type="button" className="flex-1" variant="outline" onClick={() => reset()}>
           Reset
         </Button>
 
-        <Button
-          type="submit"
-          className="flex-1"
-          disabled={status.update === 'loading'}
-        >
+        <Button type="submit" className="flex-1" disabled={status.update === 'loading'}>
           {status.update === 'loading' ? 'Updating...' : 'Update Order'}
         </Button>
       </DialogFooter>

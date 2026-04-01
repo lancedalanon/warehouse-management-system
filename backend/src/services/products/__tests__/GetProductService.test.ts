@@ -33,7 +33,9 @@ describe('GetProductService', () => {
 
     const result = await service.handle(existingProduct.id);
 
-    expect(productRepo.findOne).toHaveBeenCalledWith({ where: { id: existingProduct.id } });
+    expect(productRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingProduct.id },
+    });
     expect(result).toEqual(existingProduct);
   });
 

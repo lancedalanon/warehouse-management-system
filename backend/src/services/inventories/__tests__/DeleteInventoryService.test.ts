@@ -38,7 +38,9 @@ describe('DeleteInventoryService', () => {
       softRemove: jest.fn(),
     } as unknown as jest.Mocked<Repository<Inventory>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
 
     container.registerInstance('InventoryRepository', inventoryRepo);
     container.registerInstance(CreateAuditLogService, auditService);
@@ -51,23 +53,27 @@ describe('DeleteInventoryService', () => {
   it('should soft delete an inventory successfully', async () => {
     inventoryRepo.findOne.mockResolvedValue(existingInventory);
     inventoryRepo.softRemove.mockImplementation((inv) =>
-      Promise.resolve({ ...existingInventory, ...inv } as Inventory)
+      Promise.resolve({ ...existingInventory, ...inv } as Inventory),
     );
 
     const result = await service.handle(existingInventory.id, user);
 
     // Repository calls
-    expect(inventoryRepo.findOne).toHaveBeenCalledWith({ where: { id: existingInventory.id } });
+    expect(inventoryRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingInventory.id },
+    });
     expect(inventoryRepo.softRemove).toHaveBeenCalledWith(existingInventory);
 
     // Audit log
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'INVENTORY_DELETED',
-      auditableType: 'Inventory',
-      auditableId: existingInventory.id,
-      userId: user.sub,
-      oldValues: existingInventory,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'INVENTORY_DELETED',
+        auditableType: 'Inventory',
+        auditableId: existingInventory.id,
+        userId: user.sub,
+        oldValues: existingInventory,
+      }),
+    );
 
     expect(result).toEqual(existingInventory);
   });
@@ -75,9 +81,7 @@ describe('DeleteInventoryService', () => {
   it('should throw NotFoundException if inventory does not exist', async () => {
     inventoryRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, user))
-      .rejects
-      .toThrow(NotFoundException);
+    await expect(service.handle(999, user)).rejects.toThrow(NotFoundException);
 
     expect(inventoryRepo.softRemove).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();

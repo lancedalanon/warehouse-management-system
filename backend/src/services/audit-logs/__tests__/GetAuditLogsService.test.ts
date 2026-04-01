@@ -129,12 +129,12 @@ describe('GetAuditLogsService', () => {
 
     expect(qb.andWhere).toHaveBeenCalledWith(
       'audit.auditableType = :auditableType',
-      { auditableType: 'User' }
+      { auditableType: 'User' },
     );
 
     expect(qb.andWhere).toHaveBeenCalledWith(
       'audit.auditableId = :auditableId',
-      { auditableId: 5 }
+      { auditableId: 5 },
     );
   });
 
@@ -167,10 +167,7 @@ describe('GetAuditLogsService', () => {
 
     await service.handle(req);
 
-    expect(qb.andWhere).toHaveBeenCalledWith(
-      'audit.id = :id',
-      { id: 7 }
-    );
+    expect(qb.andWhere).toHaveBeenCalledWith('audit.id = :id', { id: 7 });
   });
 
   it('should cap limit to 100 when limit exceeds maximum', async () => {

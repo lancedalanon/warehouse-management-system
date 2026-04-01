@@ -21,11 +21,11 @@ describe('JwtService', () => {
       process.env.JWT_ACCESS_TOKEN_EXPIRES = '1h';
 
       const service = new JwtService();
-      
+
       // We check private properties indirectly via the generate method
       const result = service.generate({ id: 1 });
       const expectedExpiry = new Date('2026-01-01T01:00:00Z'); // +1 hour
-      
+
       expect(result.expiredAt).toEqual(expectedExpiry);
     });
 
@@ -35,9 +35,9 @@ describe('JwtService', () => {
 
       const service = new JwtService();
       const result = service.generate({ id: 1 });
-      
+
       // Default is 15m
-      const expectedExpiry = new Date('2026-01-01T00:15:00Z'); 
+      const expectedExpiry = new Date('2026-01-01T00:15:00Z');
       expect(result.expiredAt).toEqual(expectedExpiry);
     });
   });
@@ -50,7 +50,7 @@ describe('JwtService', () => {
 
       expect(typeof result.token).toBe('string');
       expect(result.expiredAt).toBeInstanceOf(Date);
-      
+
       // Verify the token actually contains our payload
       const decoded = jwt.decode(result.token) as jwt.JwtPayload;
       expect(decoded.sub).toBe('user123');

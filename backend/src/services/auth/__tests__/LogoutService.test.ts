@@ -37,11 +37,15 @@ describe('LogoutService', () => {
 
   it('should throw NotFoundException if refresh token is missing', async () => {
     await expect(service.handle('')).rejects.toThrow(NotFoundException);
-    await expect(service.handle('')).rejects.toThrow('Refresh token not provided');
+    await expect(service.handle('')).rejects.toThrow(
+      'Refresh token not provided',
+    );
   });
 
   it('should return message if refresh token does not exist', async () => {
-    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue('hashed-refresh-token');
+    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue(
+      'hashed-refresh-token',
+    );
     (refreshTokenRepo.findOne as jest.Mock).mockResolvedValue(null);
 
     const result = await service.handle('some-token');
@@ -54,9 +58,14 @@ describe('LogoutService', () => {
   });
 
   it('should revoke refresh token successfully', async () => {
-    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue('hashed-refresh-token');
+    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue(
+      'hashed-refresh-token',
+    );
     (refreshTokenRepo.findOne as jest.Mock).mockResolvedValue(mockRefreshToken);
-    (refreshTokenRepo.save as jest.Mock).mockResolvedValue({ ...mockRefreshToken, isRevoked: true });
+    (refreshTokenRepo.save as jest.Mock).mockResolvedValue({
+      ...mockRefreshToken,
+      isRevoked: true,
+    });
 
     const result = await service.handle('some-token');
 
@@ -65,7 +74,7 @@ describe('LogoutService', () => {
       where: { tokenHash: 'hashed-refresh-token', isRevoked: false },
     });
     expect(refreshTokenRepo.save).toHaveBeenCalledWith(
-      expect.objectContaining({ ...mockRefreshToken, isRevoked: true })
+      expect.objectContaining({ ...mockRefreshToken, isRevoked: true }),
     );
     expect(result).toEqual({ message: 'Logged out successfully' });
   });

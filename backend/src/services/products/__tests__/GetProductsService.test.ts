@@ -62,15 +62,29 @@ describe('GetProductsService', () => {
     qb.getManyAndCount.mockResolvedValue([mockProducts, 1]);
 
     const req = {
-      query: { id: 1, sku: 'SKU001', name: 'Product 1', unitType: 'pcs', page: 1, limit: 10 },
+      query: {
+        id: 1,
+        sku: 'SKU001',
+        name: 'Product 1',
+        unitType: 'pcs',
+        page: 1,
+        limit: 10,
+      },
     } as unknown as Request;
 
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith('product.id = :id', { id: 1 });
-    expect(qb.andWhere).toHaveBeenCalledWith('product.sku ILIKE :sku', { sku: '%SKU001%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('product.name ILIKE :name', { name: '%Product 1%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('product.unit_type ILIKE :unitType', { unitType: '%pcs%' });
+    expect(qb.andWhere).toHaveBeenCalledWith('product.sku ILIKE :sku', {
+      sku: '%SKU001%',
+    });
+    expect(qb.andWhere).toHaveBeenCalledWith('product.name ILIKE :name', {
+      name: '%Product 1%',
+    });
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'product.unit_type ILIKE :unitType',
+      { unitType: '%pcs%' },
+    );
   });
 
   it('should apply global search', async () => {
@@ -84,7 +98,7 @@ describe('GetProductsService', () => {
 
     expect(qb.andWhere).toHaveBeenCalledWith(
       expect.stringContaining('product.sku ILIKE :search'),
-      { search: '%prod%' }
+      { search: '%prod%' },
     );
   });
 

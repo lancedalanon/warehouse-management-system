@@ -22,7 +22,7 @@ export class CompleteOrderService implements BaseService {
   ) {}
 
   async handle(
-    order: Order, 
+    order: Order,
     data: UpdateOrderDTO,
     user?: JwtUserPayload,
   ): Promise<Order> {
@@ -53,7 +53,7 @@ export class CompleteOrderService implements BaseService {
       }
 
       // Load inventories for all incoming items
-      const inventoryIds = data.items.map(i => i.inventorySourceId);
+      const inventoryIds = data.items.map((i) => i.inventorySourceId);
       const inventories = await inventoryRepo.find({
         where: { id: In(inventoryIds) },
         relations: ['product'],
@@ -63,7 +63,9 @@ export class CompleteOrderService implements BaseService {
       const itemsValidationErrors: { field: string; message: string }[] = [];
 
       data.items.forEach((item, i) => {
-        const inv = inventories.find(inv => inv.id.toString() === item.inventorySourceId.toString());
+        const inv = inventories.find(
+          (inv) => inv.id.toString() === item.inventorySourceId.toString(),
+        );
 
         if (!inv) {
           itemsValidationErrors.push({
@@ -89,26 +91,28 @@ export class CompleteOrderService implements BaseService {
       });
 
       // If existing items is still in data items we keep it otherwise we soft delete them
-      const incomingIds = data.items.map(item => item.inventorySourceId.toString());
-
-      const itemsToKeep = existingItems.filter(item =>
-        incomingIds.includes(item.inventorySourceId.toString())
+      const incomingIds = data.items.map((item) =>
+        item.inventorySourceId.toString(),
       );
 
-      const itemsToSoftDelete = existingItems.filter(item =>
-        !incomingIds.includes(item.inventorySourceId.toString())
+      const itemsToKeep = existingItems.filter((item) =>
+        incomingIds.includes(item.inventorySourceId.toString()),
+      );
+
+      const itemsToSoftDelete = existingItems.filter(
+        (item) => !incomingIds.includes(item.inventorySourceId.toString()),
       );
 
       // Batch soft delete items
       if (itemsToSoftDelete.length > 0) {
-        const idsToSoftDelete = itemsToSoftDelete.map(item => item.id);
+        const idsToSoftDelete = itemsToSoftDelete.map((item) => item.id);
         await orderItemRepo.softDelete(idsToSoftDelete);
       }
 
       // Restore soft deleted items and upsert
       const softDeletedToRestore = itemsToKeep
-        .filter(item => item.deletedAt) // only soft-deleted
-        .map(item => item.id);
+        .filter((item) => item.deletedAt) // only soft-deleted
+        .map((item) => item.id);
 
       if (softDeletedToRestore.length > 0) {
         await orderItemRepo.restore(softDeletedToRestore);
@@ -118,7 +122,9 @@ export class CompleteOrderService implements BaseService {
       const movements: InventoryMovement[] = [];
 
       for (const item of data.items) {
-        const inv = inventories.find( inv => inv.id.toString() === item.inventorySourceId.toString() );
+        const inv = inventories.find(
+          (inv) => inv.id.toString() === item.inventorySourceId.toString(),
+        );
         if (!inv) continue;
 
         // Deduct stock
@@ -134,7 +140,7 @@ export class CompleteOrderService implements BaseService {
             notes: `Order ${order.code} completed`,
             fromState: InventoryStatus.STORED,
             toState: InventoryStatus.SHIPPED,
-          })
+          }),
         );
       }
 
@@ -143,10 +149,10 @@ export class CompleteOrderService implements BaseService {
       await inventoryMovementRepo.save(movements);
 
       // Upsert new or existing items
-      const itemsToUpsert = data.items.map(item => ({
+      const itemsToUpsert = data.items.map((item) => ({
         orderId: order.id,
         inventorySourceId: item.inventorySourceId,
-        quantity: item.quantity
+        quantity: item.quantity,
       }));
 
       await orderItemRepo.upsert(itemsToUpsert, {

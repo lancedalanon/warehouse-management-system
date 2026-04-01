@@ -50,21 +50,31 @@ describe('UpdateOrderService', () => {
     expectedPickupDate: null,
     notes: null,
     items: [
-        {
+      {
         inventorySourceId: 1,
         quantity: 5,
-        },
+      },
     ],
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    orderRepo = { findOne: jest.fn() } as unknown as jest.Mocked<Repository<Order>>;
-    pendingService = { handle: jest.fn() } as unknown as jest.Mocked<PendingOrderService>;
-    confirmService = { handle: jest.fn() } as unknown as jest.Mocked<ConfirmOrderService>;
-    completeService = { handle: jest.fn() } as unknown as jest.Mocked<CompleteOrderService>;
-    cancelService = { handle: jest.fn() } as unknown as jest.Mocked<CancelOrderService>;
+    orderRepo = { findOne: jest.fn() } as unknown as jest.Mocked<
+      Repository<Order>
+    >;
+    pendingService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<PendingOrderService>;
+    confirmService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<ConfirmOrderService>;
+    completeService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CompleteOrderService>;
+    cancelService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CancelOrderService>;
 
     container.registerInstance(PendingOrderService, pendingService);
     container.registerInstance(ConfirmOrderService, confirmService);
@@ -75,12 +85,15 @@ describe('UpdateOrderService', () => {
     service = container.resolve(UpdateOrderService);
   });
 
-
   it('should delegate to PendingOrderService for PENDING status', async () => {
     orderRepo.findOne.mockResolvedValue(order);
     pendingService.handle.mockResolvedValue(order);
 
-    const result = await service.handle(1, { ...dto, status: OrderStatus.PENDING }, mockUser);
+    const result = await service.handle(
+      1,
+      { ...dto, status: OrderStatus.PENDING },
+      mockUser,
+    );
 
     expect(pendingService.handle).toHaveBeenCalledWith(order, dto, mockUser);
     expect(result).toBe(order);
@@ -90,9 +103,17 @@ describe('UpdateOrderService', () => {
     orderRepo.findOne.mockResolvedValue(order);
     confirmService.handle.mockResolvedValue(order);
 
-    const result = await service.handle(1, { ...dto, status: OrderStatus.CONFIRMED }, mockUser);
+    const result = await service.handle(
+      1,
+      { ...dto, status: OrderStatus.CONFIRMED },
+      mockUser,
+    );
 
-    expect(confirmService.handle).toHaveBeenCalledWith(order, { ...dto, status: OrderStatus.CONFIRMED }, mockUser);
+    expect(confirmService.handle).toHaveBeenCalledWith(
+      order,
+      { ...dto, status: OrderStatus.CONFIRMED },
+      mockUser,
+    );
     expect(result).toBe(order);
   });
 
@@ -100,9 +121,17 @@ describe('UpdateOrderService', () => {
     orderRepo.findOne.mockResolvedValue(order);
     cancelService.handle.mockResolvedValue(order);
 
-    const result = await service.handle(1, { ...dto, status: OrderStatus.CANCELLED }, mockUser);
+    const result = await service.handle(
+      1,
+      { ...dto, status: OrderStatus.CANCELLED },
+      mockUser,
+    );
 
-    expect(cancelService.handle).toHaveBeenCalledWith(order, { ...dto, status: OrderStatus.CANCELLED }, mockUser);
+    expect(cancelService.handle).toHaveBeenCalledWith(
+      order,
+      { ...dto, status: OrderStatus.CANCELLED },
+      mockUser,
+    );
     expect(result).toBe(order);
   });
 
@@ -110,22 +139,37 @@ describe('UpdateOrderService', () => {
     orderRepo.findOne.mockResolvedValue(order);
     completeService.handle.mockResolvedValue(order);
 
-    const result = await service.handle(1, { ...dto, status: OrderStatus.COMPLETED }, mockUser);
+    const result = await service.handle(
+      1,
+      { ...dto, status: OrderStatus.COMPLETED },
+      mockUser,
+    );
 
-    expect(completeService.handle).toHaveBeenCalledWith(order, { ...dto, status: OrderStatus.COMPLETED }, mockUser);
+    expect(completeService.handle).toHaveBeenCalledWith(
+      order,
+      { ...dto, status: OrderStatus.COMPLETED },
+      mockUser,
+    );
     expect(result).toBe(order);
   });
 
   it('should throw ZodError for invalid status', async () => {
     orderRepo.findOne.mockResolvedValue(order);
 
-    await expect(service.handle(1, { ...dto, status: 'INVALID_STATUS' as OrderStatus }, mockUser))
-      .rejects.toBeInstanceOf(ZodError);
+    await expect(
+      service.handle(
+        1,
+        { ...dto, status: 'INVALID_STATUS' as OrderStatus },
+        mockUser,
+      ),
+    ).rejects.toBeInstanceOf(ZodError);
   });
 
   it('should throw NotFoundException if order not found', async () => {
     orderRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(1, dto, mockUser)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.handle(1, dto, mockUser)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });

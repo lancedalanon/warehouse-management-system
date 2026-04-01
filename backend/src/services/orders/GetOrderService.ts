@@ -15,7 +15,7 @@ export class GetOrderService implements BaseService {
     const order = await this.orderRepo.findOne({
       where: { id },
       relations: [
-        'items', 
+        'items',
         'items.inventorySource',
         'items.inventorySource.product',
         'items.inventorySource.location',

@@ -86,7 +86,10 @@ describe('WriteOffInventoryService', () => {
   it('should write off inventory successfully', async () => {
     const dto = makeDTO(10, InventoryAction.STORE, 'damaged');
 
-    inventoryRepo.save.mockResolvedValue({ ...inventory, storedQuantity: 40 } as Inventory);
+    inventoryRepo.save.mockResolvedValue({
+      ...inventory,
+      storedQuantity: 40,
+    } as Inventory);
 
     inventoryRepo.findOne.mockResolvedValue({
       ...inventory,

@@ -18,8 +18,8 @@ describe('EmailProviderFactory', () => {
 
     mockedCreateTransport.mockReturnValue(transporterMock);
 
-    (mailConfig).deliveryType = 'smtp';
-    (mailConfig).smtp = {
+    mailConfig.deliveryType = 'smtp';
+    mailConfig.smtp = {
       host: 'smtp.test.com',
       port: 587,
       secure: false,
@@ -47,10 +47,12 @@ describe('EmailProviderFactory', () => {
   it('should return Brevo API provider when deliveryType is api and provider is brevo', () => {
     const providerInstance = {};
 
-    (BrevoEmailProvider as jest.Mock).mockImplementation(() => providerInstance);
+    (BrevoEmailProvider as jest.Mock).mockImplementation(
+      () => providerInstance,
+    );
 
-    (mailConfig).deliveryType = 'api';
-    (mailConfig).api = {
+    mailConfig.deliveryType = 'api';
+    mailConfig.api = {
       provider: 'brevo',
     };
 
@@ -66,11 +68,11 @@ describe('EmailProviderFactory', () => {
   it('should throw error for unsupported api provider', () => {
     mailConfig.deliveryType = 'api';
     mailConfig.api = {
-        provider: 'unknown-provider' as unknown as 'brevo',
+      provider: 'unknown-provider' as unknown as 'brevo',
     };
 
     expect(() => EmailProviderFactory.resolve()).toThrow(
-        'Unsupported API provider: unknown-provider',
+      'Unsupported API provider: unknown-provider',
     );
   });
 
@@ -78,7 +80,7 @@ describe('EmailProviderFactory', () => {
     mailConfig.deliveryType = 'invalid' as unknown as 'smtp';
 
     expect(() => EmailProviderFactory.resolve()).toThrow(
-        'Unsupported mail delivery type: invalid',
+      'Unsupported mail delivery type: invalid',
     );
   });
 });

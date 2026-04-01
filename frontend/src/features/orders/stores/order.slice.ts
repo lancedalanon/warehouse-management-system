@@ -1,11 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { OrdersState } from './order.types';
-import {
-  getOrdersThunk,
-  getOrderThunk,
-  createOrderThunk,
-  updateOrderThunk,
-} from './order.thunks';
+import { getOrdersThunk, getOrderThunk, createOrderThunk, updateOrderThunk } from './order.thunks';
 
 const initialState: OrdersState = {
   items: [],
@@ -46,9 +41,7 @@ const ordersSlice = createSlice({
       .addCase(getOrderThunk.fulfilled, (state, action) => {
         state.singleOrder = action.payload;
 
-        const index = state.items.findIndex(
-          (o) => o.id === action.payload.id,
-        );
+        const index = state.items.findIndex((o) => o.id === action.payload.id);
 
         if (index !== -1) {
           state.items[index] = action.payload;
@@ -81,9 +74,7 @@ const ordersSlice = createSlice({
       .addCase(updateOrderThunk.fulfilled, (state, action) => {
         state.status.update = 'success';
 
-        const index = state.items.findIndex(
-          (o) => o.id === action.payload.id,
-        );
+        const index = state.items.findIndex((o) => o.id === action.payload.id);
 
         if (index !== -1) {
           state.items[index] = action.payload;
@@ -102,11 +93,6 @@ const ordersSlice = createSlice({
 
 export const { clearOrdersState } = ordersSlice.actions;
 
-export {
-  getOrdersThunk,
-  getOrderThunk,
-  createOrderThunk,
-  updateOrderThunk,
-};
+export { getOrdersThunk, getOrderThunk, createOrderThunk, updateOrderThunk };
 
 export default ordersSlice.reducer;

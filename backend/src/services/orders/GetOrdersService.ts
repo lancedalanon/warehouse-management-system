@@ -51,8 +51,10 @@ export class GetOrdersService implements BaseService {
 
     // Filters
     if (query.id) qb.andWhere('order.id = :id', { id: Number(query.id) });
-    if (query.code) qb.andWhere('order.code ILIKE :code', { code: `%${query.code}%` });
-    if (query.status) qb.andWhere('order.status = :status', { status: query.status });
+    if (query.code)
+      qb.andWhere('order.code ILIKE :code', { code: `%${query.code}%` });
+    if (query.status)
+      qb.andWhere('order.status = :status', { status: query.status });
 
     // Global search
     if (query.search) {

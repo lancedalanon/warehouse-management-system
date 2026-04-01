@@ -33,7 +33,10 @@ describe('UpdatePasswordService', () => {
   };
 
   beforeEach(() => {
-    userRepo = { findOne: jest.fn(), save: jest.fn() } as unknown as Repository<User>;
+    userRepo = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+    } as unknown as Repository<User>;
     container.registerInstance('UserRepository', userRepo);
     service = container.resolve(UpdatePasswordService);
     jest.clearAllMocks();
@@ -41,15 +44,17 @@ describe('UpdatePasswordService', () => {
 
   it('should throw if unauthenticated', async () => {
     const req = { user: null } as unknown as Request;
-    await expect(service.handle(req, validPayload))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(service.handle(req, validPayload)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should throw if user not found', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(null);
     const req = { user: { sub: 1 } } as unknown as Request;
-    await expect(service.handle(req, validPayload))
-      .rejects.toThrow('User not found');
+    await expect(service.handle(req, validPayload)).rejects.toThrow(
+      'User not found',
+    );
   });
 
   it('should throw if current password is incorrect', async () => {
@@ -57,28 +62,31 @@ describe('UpdatePasswordService', () => {
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
     const req = { user: { sub: 1 } } as unknown as Request;
 
-    await expect(service.handle(req, validPayload))
-      .rejects.toThrow('Incorrect current password');
+    await expect(service.handle(req, validPayload)).rejects.toThrow(
+      'Incorrect current password',
+    );
   });
 
   it('should throw if new password is same as current', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
     (bcrypt.compare as jest.Mock)
-      .mockResolvedValueOnce(true)  // current password correct
+      .mockResolvedValueOnce(true) // current password correct
       .mockResolvedValueOnce(true); // new password same
     const req = { user: { sub: 1 } } as unknown as Request;
 
-    await expect(service.handle(req, {
-      ...validPayload,
-      newPassword: 'current123',
-      confirmNewPassword: 'current123',
-    })).rejects.toThrow(BadRequestException);
+    await expect(
+      service.handle(req, {
+        ...validPayload,
+        newPassword: 'current123',
+        confirmNewPassword: 'current123',
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('should successfully update password', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
     (bcrypt.compare as jest.Mock)
-      .mockResolvedValueOnce(true)  // current password correct
+      .mockResolvedValueOnce(true) // current password correct
       .mockResolvedValueOnce(false); // new password different
     (bcrypt.hash as jest.Mock).mockResolvedValue('newHash');
 
@@ -86,10 +94,14 @@ describe('UpdatePasswordService', () => {
     const result = await service.handle(req, validPayload);
 
     expect(bcrypt.hash).toHaveBeenCalledWith('newpass123', 10);
-    expect(userRepo.save).toHaveBeenCalledWith(expect.objectContaining({ password: 'newHash' }));
-    expect(result).toEqual(expect.objectContaining({
-      firstName: 'Old',
-      email: 'test@test.com',
-    }));
+    expect(userRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ password: 'newHash' }),
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        firstName: 'Old',
+        email: 'test@test.com',
+      }),
+    );
   });
 });

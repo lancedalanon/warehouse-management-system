@@ -89,13 +89,13 @@ describe('StoreInventoryService', () => {
     const data = makeDTO(10, 'Test note');
     // Mock Location as a full entity for testing
     const mockLocation = {
-        id: 100,
-        name: 'Location',
-        code: 'LOC001',
-        type: 'Warehouse',
-        capacity: 1000,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      id: 100,
+      name: 'Location',
+      code: 'LOC001',
+      type: 'Warehouse',
+      capacity: 1000,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     } as unknown as Location; // cast entire object
 
     // Mock the product repository
@@ -105,36 +105,50 @@ describe('StoreInventoryService', () => {
     // Mock the inventory repository
     inventoryRepo.save.mockResolvedValue({ ...inventory, storedQuantity: 10 });
     inventoryRepo.findOne.mockResolvedValue({
-        ...inventory,
-        storedQuantity: 10,
-        product,
-        location: mockLocation,
+      ...inventory,
+      storedQuantity: 10,
+      product,
+      location: mockLocation,
     } as unknown as Inventory);
 
     const result = await service.handle(inventory, data, mockUser);
 
-    expect(productRepo.findOne).toHaveBeenCalledWith({ where: { id: inventory.productId } });
-    expect(productRepo.save).toHaveBeenCalledWith({ ...product, receivedQuantity: 40 });
-    expect(inventoryRepo.save).toHaveBeenCalledWith({ ...inventory, storedQuantity: 10 });
+    expect(productRepo.findOne).toHaveBeenCalledWith({
+      where: { id: inventory.productId },
+    });
+    expect(productRepo.save).toHaveBeenCalledWith({
+      ...product,
+      receivedQuantity: 40,
+    });
+    expect(inventoryRepo.save).toHaveBeenCalledWith({
+      ...inventory,
+      storedQuantity: 10,
+    });
 
-    expect(movementService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      inventoryId: 1,
-      quantity: 10,
-      fromState: InventoryStatus.RECEIVED,
-      toState: InventoryStatus.STORED,
-    }));
+    expect(movementService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        inventoryId: 1,
+        quantity: 10,
+        fromState: InventoryStatus.RECEIVED,
+        toState: InventoryStatus.STORED,
+      }),
+    );
 
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'INVENTORY_ADD_STORED_QUANTITY',
-      auditableId: 1,
-      userId: mockUser.sub,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'INVENTORY_ADD_STORED_QUANTITY',
+        auditableId: 1,
+        userId: mockUser.sub,
+      }),
+    );
 
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'PRODUCT_UPDATED',
-      auditableId: product.id,
-      userId: mockUser.sub,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'PRODUCT_UPDATED',
+        auditableId: product.id,
+        userId: mockUser.sub,
+      }),
+    );
 
     expect(result.storedQuantity).toBe(10);
   });
@@ -142,7 +156,9 @@ describe('StoreInventoryService', () => {
   it('should throw ValidationException if storedQuantity is negative', async () => {
     const data = makeDTO(-5);
 
-    await expect(service.handle(inventory, data, mockUser)).rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(inventory, data, mockUser),
+    ).rejects.toBeInstanceOf(ValidationException);
 
     expect(productRepo.findOne).not.toHaveBeenCalled();
     expect(inventoryRepo.save).not.toHaveBeenCalled();
@@ -154,7 +170,9 @@ describe('StoreInventoryService', () => {
 
     productRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(inventory, data, mockUser)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(
+      service.handle(inventory, data, mockUser),
+    ).rejects.toBeInstanceOf(NotFoundException);
 
     expect(productRepo.save).not.toHaveBeenCalled();
     expect(inventoryRepo.save).not.toHaveBeenCalled();
@@ -165,7 +183,9 @@ describe('StoreInventoryService', () => {
     const data = makeDTO(100); // exceeds product.receivedQuantity of 50
     productRepo.findOne.mockResolvedValue(product);
 
-    await expect(service.handle(inventory, data, mockUser)).rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(inventory, data, mockUser),
+    ).rejects.toBeInstanceOf(ValidationException);
 
     expect(inventoryRepo.save).not.toHaveBeenCalled();
     expect(productRepo.save).not.toHaveBeenCalled();
@@ -180,6 +200,8 @@ describe('StoreInventoryService', () => {
     productRepo.save.mockResolvedValue({ ...product, receivedQuantity: 45 });
     inventoryRepo.findOne.mockResolvedValue(null); // simulate missing inventory after save
 
-    await expect(service.handle(inventory, data, mockUser)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(
+      service.handle(inventory, data, mockUser),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

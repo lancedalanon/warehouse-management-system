@@ -18,8 +18,8 @@ describe('DeleteOrderService', () => {
     id: 1,
     code: 'ORD001',
     items: [
-        { id: 10, quantity: 2 } as OrderItem,
-        { id: 11, quantity: 1 } as OrderItem,
+      { id: 10, quantity: 2 } as OrderItem,
+      { id: 11, quantity: 1 } as OrderItem,
     ],
   } as Order;
 
@@ -62,17 +62,17 @@ describe('DeleteOrderService', () => {
   it('should soft delete an order and its items successfully', async () => {
     orderRepo.findOne.mockResolvedValue(existingOrder);
     orderItemRepo.softRemove.mockImplementation(
-        (entity: DeepPartial<OrderItem> | DeepPartial<OrderItem>[]) => {
-            const entities = Array.isArray(entity) ? entity : [entity];
-            return Promise.resolve(entities.map((e) => ({ ...e } as OrderItem))[0]);
-        }
+      (entity: DeepPartial<OrderItem> | DeepPartial<OrderItem>[]) => {
+        const entities = Array.isArray(entity) ? entity : [entity];
+        return Promise.resolve(entities.map((e) => ({ ...e }) as OrderItem)[0]);
+      },
     );
 
     orderRepo.softRemove.mockImplementation(
-        (entity: DeepPartial<Order> | DeepPartial<Order>[]) => {
-            const entities = Array.isArray(entity) ? entity : [entity];
-            return Promise.resolve(entities.map((e) => ({ ...e } as Order))[0]);
-        }
+      (entity: DeepPartial<Order> | DeepPartial<Order>[]) => {
+        const entities = Array.isArray(entity) ? entity : [entity];
+        return Promise.resolve(entities.map((e) => ({ ...e }) as Order)[0]);
+      },
     );
 
     const result = await service.handle(existingOrder.id, mockUser);
@@ -85,14 +85,16 @@ describe('DeleteOrderService', () => {
     expect(orderItemRepo.softRemove).toHaveBeenCalledWith(existingOrder.items);
     expect(orderRepo.softRemove).toHaveBeenCalledWith(existingOrder);
 
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'ORDER_DELETED',
-      auditableType: 'Order',
-      auditableId: existingOrder.id,
-      userId: mockUser.sub,
-      oldValues: existingOrder,
-      description: `Order deleted with code ${existingOrder.code}`,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'ORDER_DELETED',
+        auditableType: 'Order',
+        auditableId: existingOrder.id,
+        userId: mockUser.sub,
+        oldValues: existingOrder,
+        description: `Order deleted with code ${existingOrder.code}`,
+      }),
+    );
 
     expect(result).toEqual(existingOrder);
   });
@@ -100,7 +102,9 @@ describe('DeleteOrderService', () => {
   it('should throw NotFoundException if order does not exist', async () => {
     orderRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, mockUser)).rejects.toThrow(NotFoundException);
+    await expect(service.handle(999, mockUser)).rejects.toThrow(
+      NotFoundException,
+    );
 
     expect(orderItemRepo.softRemove).not.toHaveBeenCalled();
     expect(orderRepo.softRemove).not.toHaveBeenCalled();

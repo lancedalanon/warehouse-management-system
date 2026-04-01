@@ -16,7 +16,7 @@ export class WriteOffInventoryService implements BaseService {
   constructor(
     @inject(CreateAuditLogService)
     private readonly createAuditLogService: CreateAuditLogService,
-    
+
     @inject(CreateInventoryMovementService)
     private readonly createInventoryMovementService: CreateInventoryMovementService,
 
@@ -33,15 +33,17 @@ export class WriteOffInventoryService implements BaseService {
 
     // Schema already enforces this, but we still guard for safety
     if (!writeOffFrom) {
-      throw new ValidationHandler(
-        { field: 'writeOffFrom', message: 'Source of write-off is required'},
-      );
+      throw new ValidationHandler({
+        field: 'writeOffFrom',
+        message: 'Source of write-off is required',
+      });
     }
 
     if (!writeOffQuantity || writeOffQuantity <= 0) {
-      throw new ValidationHandler(
-        { field: 'writeOffQuantity', message: 'Write-off quantity must be greater than 0'},
-      );
+      throw new ValidationHandler({
+        field: 'writeOffQuantity',
+        message: 'Write-off quantity must be greater than 0',
+      });
     }
 
     const oldInventory = { ...inventory };
@@ -59,15 +61,17 @@ export class WriteOffInventoryService implements BaseService {
         break;
 
       default:
-        throw new ValidationHandler(
-          { field: 'writeOffFrom', message: 'Invalid source for write-off'},
-        );
+        throw new ValidationHandler({
+          field: 'writeOffFrom',
+          message: 'Invalid source for write-off',
+        });
     }
 
     if (writeOffQuantity > sourceValue) {
-      throw new ValidationHandler(
-        { field: 'writeOffQuantity', message: `Cannot write off more than ${writeOffFrom.toLowerCase()} quantity (${sourceValue})`},
-      );
+      throw new ValidationHandler({
+        field: 'writeOffQuantity',
+        message: `Cannot write off more than ${writeOffFrom.toLowerCase()} quantity (${sourceValue})`,
+      });
     }
 
     // Deduct from the selected inventory bucket
@@ -115,9 +119,10 @@ export class WriteOffInventoryService implements BaseService {
       case InventoryAction.STORE:
         return InventoryStatus.STORED;
       default:
-        throw new ValidationHandler(
-          { field: 'writeOffFrom', message: 'Invalid source for write-off'},
-        );
+        throw new ValidationHandler({
+          field: 'writeOffFrom',
+          message: 'Invalid source for write-off',
+        });
     }
   }
 }

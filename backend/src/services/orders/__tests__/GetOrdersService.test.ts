@@ -66,14 +66,20 @@ describe('GetOrdersService', () => {
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith('order.id = :id', { id: 1 });
-    expect(qb.andWhere).toHaveBeenCalledWith('order.code ILIKE :code', { code: '%ORD001%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('order.status = :status', { status: 'PENDING' });
+    expect(qb.andWhere).toHaveBeenCalledWith('order.code ILIKE :code', {
+      code: '%ORD001%',
+    });
+    expect(qb.andWhere).toHaveBeenCalledWith('order.status = :status', {
+      status: 'PENDING',
+    });
   });
 
   it('should apply global search', async () => {
     qb.getManyAndCount.mockResolvedValue([mockOrders, 1]);
 
-    const req = { query: { search: 'ORD', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { search: 'ORD', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
@@ -86,7 +92,14 @@ describe('GetOrdersService', () => {
   it('should apply custom sorting', async () => {
     qb.getManyAndCount.mockResolvedValue([mockOrders, 1]);
 
-    const req = { query: { sortBy: 'recipientName', sortDirection: 'ASC', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: {
+        sortBy: 'recipientName',
+        sortDirection: 'ASC',
+        page: 1,
+        limit: 10,
+      },
+    } as unknown as Request;
 
     await service.handle(req);
 
@@ -96,7 +109,9 @@ describe('GetOrdersService', () => {
   it('should fallback to id sorting when sortBy is invalid', async () => {
     qb.getManyAndCount.mockResolvedValue([mockOrders, 1]);
 
-    const req = { query: { sortBy: 'invalidColumn', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'invalidColumn', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 

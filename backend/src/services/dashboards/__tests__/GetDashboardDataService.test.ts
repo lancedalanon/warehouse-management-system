@@ -10,7 +10,14 @@ jest.mock('@/enums/InventoryStatus', () => {
   const originalModule = jest.requireActual('@/enums/InventoryStatus');
   return {
     ...originalModule,
-    InventoryStatuses: ['received', 'stored', 'reserved', 'written-off', 'shipped', 'transferred'],
+    InventoryStatuses: [
+      'received',
+      'stored',
+      'reserved',
+      'written-off',
+      'shipped',
+      'transferred',
+    ],
   };
 });
 
@@ -36,7 +43,15 @@ describe('GetDashboardDataService', () => {
           ]);
         } else {
           return Promise.resolve([
-            { dateKey: '2026-02-20', received: 5, stored: 3, reserved: 0, writtenOff: 0, shipped: 0, transferred: 0 },
+            {
+              dateKey: '2026-02-20',
+              received: 5,
+              stored: 3,
+              reserved: 0,
+              writtenOff: 0,
+              shipped: 0,
+              transferred: 0,
+            },
           ]);
         }
       }),
@@ -52,19 +67,27 @@ describe('GetDashboardDataService', () => {
 
     expect(result.inventoryStatuses).toEqual(
       expect.arrayContaining([
-        { count: 0, type: "Received" }, 
-        { count: 0, type: "Stored" }, 
-        { count: 0, type: "Reserved" }, 
-        { count: 0, type: "Written-off" }, 
-        { count: 0, type: "Shipped" }, 
-        { count: 0, type: "Transferred" }
-      ])
+        { count: 0, type: 'Received' },
+        { count: 0, type: 'Stored' },
+        { count: 0, type: 'Reserved' },
+        { count: 0, type: 'Written-off' },
+        { count: 0, type: 'Shipped' },
+        { count: 0, type: 'Transferred' },
+      ]),
     );
 
     expect(result.recentMovements).toEqual(
       expect.arrayContaining([
-        { date: '2026-02-20', received: 5, stored: 3, reserved: 0, writtenOff: 0, shipped: 0, transferred: 0 },
-      ])
+        {
+          date: '2026-02-20',
+          received: 5,
+          stored: 3,
+          reserved: 0,
+          writtenOff: 0,
+          shipped: 0,
+          transferred: 0,
+        },
+      ]),
     );
 
     expect(mockRepo.query).toHaveBeenCalled();

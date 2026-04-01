@@ -22,19 +22,13 @@ export const createOrderSchema = z
     items: z
       .array(
         z.object({
-          inventorySourceId: z.coerce
-            .number()
-            .int()
-            .positive('Inventory source is required'),
+          inventorySourceId: z.coerce.number().int().positive('Inventory source is required'),
 
-          quantity: z.coerce
-            .number()
-            .int()
-            .positive('Quantity must be greater than zero'),
+          quantity: z.coerce.number().int().positive('Quantity must be greater than zero'),
         }),
       )
       .min(1, 'At least one order item is required'),
   })
   .strict();
-  
+
 export type CreateOrderFormValues = z.infer<typeof createOrderSchema>;

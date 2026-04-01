@@ -10,7 +10,10 @@ import { PendingOrderService } from '@/services/orders/PendingOrderService';
 import { ConfirmOrderService } from '@/services/orders/ConfirmOrderService';
 import { CompleteOrderService } from '@/services/orders/CompleteOrderService';
 import { CancelOrderService } from '@/services/orders/CancelOrderService';
-import { UpdateOrderDTO, UpdateOrderSchema } from '@/schemas/orders/UpdateOrderSchema';
+import {
+  UpdateOrderDTO,
+  UpdateOrderSchema,
+} from '@/schemas/orders/UpdateOrderSchema';
 
 @injectable()
 export class UpdateOrderService implements BaseService {

@@ -5,7 +5,10 @@ import { InvitationRequest } from '@/entities/InvitationRequest';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
 import bcrypt from 'bcrypt';
 import { Request } from 'express';
-import { ChangeEmailSchema, ChangeEmailDTO } from '@/schemas/auth/ChangeEmailSchema';
+import {
+  ChangeEmailSchema,
+  ChangeEmailDTO,
+} from '@/schemas/auth/ChangeEmailSchema';
 import { VerifyEmailNotification } from '@/emails/VerifyEmailNotification';
 import { EmailVerifyService } from '@/lib/EmailVerifyService';
 import { ValidationHandler } from '@/lib/ValidationHandler';
@@ -81,7 +84,10 @@ export class ChangeEmailService {
 
     if (existingUser) {
       throw new ValidationHandler([
-        { field: 'email', message: 'This email is already registered to another account'},
+        {
+          field: 'email',
+          message: 'This email is already registered to another account',
+        },
       ]);
     }
 

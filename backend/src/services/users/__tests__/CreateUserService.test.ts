@@ -151,7 +151,7 @@ describe('CreateUserService', () => {
         suffix: null,
         email: 'john@example.com',
         roleId: 2,
-        token: null
+        token: null,
       }),
     ).rejects.toBeInstanceOf(ValidationException);
 
@@ -171,7 +171,7 @@ describe('CreateUserService', () => {
         suffix: null,
         email: 'john@example.com',
         roleId: 999,
-        token: null
+        token: null,
       }),
     ).rejects.toBeInstanceOf(ValidationException);
   });
@@ -192,7 +192,7 @@ describe('CreateUserService', () => {
         suffix: null,
         email: 'john@example.com',
         roleId: 1,
-        token: null
+        token: null,
       }),
     ).rejects.toBeInstanceOf(ValidationException);
   });

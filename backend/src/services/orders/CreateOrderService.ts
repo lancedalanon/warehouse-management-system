@@ -22,10 +22,7 @@ export class CreateOrderService implements BaseService {
     private readonly createAuditLogService: CreateAuditLogService,
   ) {}
 
-  async handle(
-    data: CreateOrderDTO,
-    user?: JwtUserPayload,
-  ): Promise<Order> {
+  async handle(data: CreateOrderDTO, user?: JwtUserPayload): Promise<Order> {
     const parsedData = await CreateOrderSchema.parseAsync(data);
 
     return await AppDataSource.transaction(async (manager: EntityManager) => {
@@ -47,7 +44,7 @@ export class CreateOrderService implements BaseService {
       }
 
       // Load inventories for all items
-      const inventoryIds = parsedData.items.map(i => i.inventorySourceId);
+      const inventoryIds = parsedData.items.map((i) => i.inventorySourceId);
       const inventories = await inventoryRepo.find({
         where: { id: In(inventoryIds) },
         relations: ['product'],
@@ -57,7 +54,9 @@ export class CreateOrderService implements BaseService {
       const itemsValidationErrors: { field: string; message: string }[] = [];
 
       parsedData.items.forEach((item, i) => {
-        const inv = inventories.find(inv => inv.id.toString() === item.inventorySourceId.toString());
+        const inv = inventories.find(
+          (inv) => inv.id.toString() === item.inventorySourceId.toString(),
+        );
 
         if (!inv) {
           itemsValidationErrors.push({
@@ -91,12 +90,12 @@ export class CreateOrderService implements BaseService {
       const savedOrder = await orderRepo.save(order);
 
       // Create order items
-      const items = parsedData.items.map(item =>
+      const items = parsedData.items.map((item) =>
         orderItemRepo.create({
           orderId: savedOrder.id,
           inventorySourceId: item.inventorySourceId,
           quantity: item.quantity,
-        })
+        }),
       );
 
       await orderItemRepo.save(items);

@@ -64,34 +64,51 @@ describe('GetLocationsService', () => {
     qb.getManyAndCount.mockResolvedValue([mockLocations, 1]);
 
     const req = {
-      query: { id: 1, code: 'LOC001', name: 'Location 1', type: 'Warehouse', page: 1, limit: 10 },
+      query: {
+        id: 1,
+        code: 'LOC001',
+        name: 'Location 1',
+        type: 'Warehouse',
+        page: 1,
+        limit: 10,
+      },
     } as unknown as Request;
 
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith('location.id = :id', { id: 1 });
-    expect(qb.andWhere).toHaveBeenCalledWith('location.code ILIKE :code', { code: '%LOC001%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('location.name ILIKE :name', { name: '%Location 1%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('location.type ILIKE :type', { type: '%Warehouse%' });
+    expect(qb.andWhere).toHaveBeenCalledWith('location.code ILIKE :code', {
+      code: '%LOC001%',
+    });
+    expect(qb.andWhere).toHaveBeenCalledWith('location.name ILIKE :name', {
+      name: '%Location 1%',
+    });
+    expect(qb.andWhere).toHaveBeenCalledWith('location.type ILIKE :type', {
+      type: '%Warehouse%',
+    });
   });
 
   it('should apply global search', async () => {
     qb.getManyAndCount.mockResolvedValue([mockLocations, 1]);
 
-    const req = { query: { search: 'LOC', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { search: 'LOC', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith(
       expect.stringContaining('location.code ILIKE :search'),
-      { search: '%LOC%' }
+      { search: '%LOC%' },
     );
   });
 
   it('should apply custom sorting', async () => {
     qb.getManyAndCount.mockResolvedValue([mockLocations, 1]);
 
-    const req = { query: { sortBy: 'name', sortDirection: 'ASC', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'name', sortDirection: 'ASC', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
@@ -101,7 +118,9 @@ describe('GetLocationsService', () => {
   it('should fallback to id sorting when sortBy is invalid', async () => {
     qb.getManyAndCount.mockResolvedValue([mockLocations, 1]);
 
-    const req = { query: { sortBy: 'invalidColumn', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'invalidColumn', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 

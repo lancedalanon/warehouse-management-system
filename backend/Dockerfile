@@ -26,8 +26,8 @@ COPY frontend ./
 
 # Use env from GitHub Actions secrets by creating .env file dynamically
 # This will be baked into build
-ARG REACT_APP_API_URL
-RUN echo "REACT_APP_API_URL=${REACT_APP_API_URL}" > .env
+ARG VITE_API_BASE_URL
+RUN echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" > .env
 
 # Build frontend
 RUN npm run build

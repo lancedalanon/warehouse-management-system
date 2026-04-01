@@ -167,7 +167,11 @@ describe('CancelOrderService', () => {
     ]);
 
     orderItemRepo.find.mockResolvedValue([
-      { id: 5, inventorySourceId: 1, deletedAt: new Date() } as unknown as OrderItem,
+      {
+        id: 5,
+        inventorySourceId: 1,
+        deletedAt: new Date(),
+      } as unknown as OrderItem,
     ]);
 
     orderRepo.save.mockResolvedValue(order);
@@ -200,8 +204,16 @@ describe('CancelOrderService', () => {
     ]);
 
     orderItemRepo.find.mockResolvedValue([
-      { id: 5, inventorySourceId: 1, deletedAt: new Date() } as unknown as OrderItem,
-      { id: 6, inventorySourceId: 1, deletedAt: new Date() } as unknown as OrderItem,
+      {
+        id: 5,
+        inventorySourceId: 1,
+        deletedAt: new Date(),
+      } as unknown as OrderItem,
+      {
+        id: 6,
+        inventorySourceId: 1,
+        deletedAt: new Date(),
+      } as unknown as OrderItem,
     ]);
 
     orderRepo.save.mockResolvedValue(order);

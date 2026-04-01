@@ -48,8 +48,13 @@ describe('GetInvitationRequestsService', () => {
 
     const result = await service.handle(req);
 
-    expect(invitationRepo.createQueryBuilder).toHaveBeenCalledWith('invitation');
-    expect(qb.leftJoinAndSelect).toHaveBeenCalledWith('invitation.role', 'role');
+    expect(invitationRepo.createQueryBuilder).toHaveBeenCalledWith(
+      'invitation',
+    );
+    expect(qb.leftJoinAndSelect).toHaveBeenCalledWith(
+      'invitation.role',
+      'role',
+    );
     expect(qb.orderBy).toHaveBeenCalledWith('invitation.createdAt', 'DESC');
     expect(qb.skip).toHaveBeenCalledWith(0);
     expect(qb.take).toHaveBeenCalledWith(10);
@@ -60,18 +65,24 @@ describe('GetInvitationRequestsService', () => {
   it('should apply filters for id and status', async () => {
     qb.getManyAndCount.mockResolvedValue([mockRequests, 1]);
 
-    const req = { query: { id: 1, status: 'declined', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { id: 1, status: 'declined', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith('invitation.id = :id', { id: 1 });
-    expect(qb.andWhere).toHaveBeenCalledWith('invitation.declinedAt IS NOT NULL');
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'invitation.declinedAt IS NOT NULL',
+    );
   });
 
   it('should apply global search', async () => {
     qb.getManyAndCount.mockResolvedValue([mockRequests, 1]);
 
-    const req = { query: { search: 'test', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { search: 'test', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
@@ -84,7 +95,9 @@ describe('GetInvitationRequestsService', () => {
   it('should apply custom sorting', async () => {
     qb.getManyAndCount.mockResolvedValue([mockRequests, 1]);
 
-    const req = { query: { sortBy: 'email', sortDirection: 'ASC', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'email', sortDirection: 'ASC', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
@@ -94,7 +107,9 @@ describe('GetInvitationRequestsService', () => {
   it('should fallback to createdAt sorting when sortBy is invalid', async () => {
     qb.getManyAndCount.mockResolvedValue([mockRequests, 1]);
 
-    const req = { query: { sortBy: 'invalidColumn', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'invalidColumn', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 

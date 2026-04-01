@@ -76,32 +76,49 @@ describe('GetInventoryMovementsService', () => {
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith('movement.id = :id', { id: 1 });
-    expect(qb.andWhere).toHaveBeenCalledWith('movement.inventoryId = :inventoryId', { inventoryId: 2 });
-    expect(qb.andWhere).toHaveBeenCalledWith('movement.fromState ILIKE :fromState', { fromState: '%received%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('movement.toState ILIKE :toState', { toState: '%stored%' });
-    expect(qb.andWhere).toHaveBeenCalledWith('movement.fromLocationId = :fromLocationId', { fromLocationId: 1 });
-    expect(qb.andWhere).toHaveBeenCalledWith('movement.toLocationId = :toLocationId', { toLocationId: 2 });
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'movement.inventoryId = :inventoryId',
+      { inventoryId: 2 },
+    );
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'movement.fromState ILIKE :fromState',
+      { fromState: '%received%' },
+    );
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'movement.toState ILIKE :toState',
+      { toState: '%stored%' },
+    );
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'movement.fromLocationId = :fromLocationId',
+      { fromLocationId: 1 },
+    );
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'movement.toLocationId = :toLocationId',
+      { toLocationId: 2 },
+    );
   });
 
   it('should apply global search', async () => {
     qb.getManyAndCount.mockResolvedValue([mockMovements, 1]);
 
-    const req = { query: { search: 'test', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { search: 'test', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
     expect(qb.andWhere).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'movement.type ILIKE :search'
-      ),
-      { search: '%test%' }
+      expect.stringContaining('movement.type ILIKE :search'),
+      { search: '%test%' },
     );
   });
 
   it('should apply custom sorting', async () => {
     qb.getManyAndCount.mockResolvedValue([mockMovements, 1]);
 
-    const req = { query: { sortBy: 'quantity', sortDirection: 'ASC', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'quantity', sortDirection: 'ASC', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 
@@ -111,7 +128,9 @@ describe('GetInventoryMovementsService', () => {
   it('should fallback to createdAt sorting when sortBy is invalid', async () => {
     qb.getManyAndCount.mockResolvedValue([mockMovements, 1]);
 
-    const req = { query: { sortBy: 'invalidColumn', page: 1, limit: 10 } } as unknown as Request;
+    const req = {
+      query: { sortBy: 'invalidColumn', page: 1, limit: 10 },
+    } as unknown as Request;
 
     await service.handle(req);
 

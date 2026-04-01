@@ -60,19 +60,29 @@ describe('PendingOrderService', () => {
     priorityLevel: OrderPriority.MEDIUM,
     expectedPickupDate: null,
     notes: null,
-    items: [
-      { inventorySourceId: 1, quantity: 5 },
-    ],
+    items: [{ inventorySourceId: 1, quantity: 5 }],
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    orderRepo = { findOne: jest.fn(), save: jest.fn() } as unknown as jest.Mocked<Repository<Order>>;
-    orderItemRepo = { find: jest.fn(), upsert: jest.fn(), softDelete: jest.fn(), restore: jest.fn() } as unknown as jest.Mocked<Repository<OrderItem>>;
-    inventoryRepo = { find: jest.fn() } as unknown as jest.Mocked<Repository<Inventory>>; // <-- added
+    orderRepo = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+    } as unknown as jest.Mocked<Repository<Order>>;
+    orderItemRepo = {
+      find: jest.fn(),
+      upsert: jest.fn(),
+      softDelete: jest.fn(),
+      restore: jest.fn(),
+    } as unknown as jest.Mocked<Repository<OrderItem>>;
+    inventoryRepo = { find: jest.fn() } as unknown as jest.Mocked<
+      Repository<Inventory>
+    >; // <-- added
 
-    manager = { getRepository: jest.fn() } as unknown as jest.Mocked<EntityManager>;
+    manager = {
+      getRepository: jest.fn(),
+    } as unknown as jest.Mocked<EntityManager>;
     manager.getRepository.mockImplementation((entity) => {
       if (entity === Order) return orderRepo;
       if (entity === OrderItem) return orderItemRepo;
@@ -80,18 +90,27 @@ describe('PendingOrderService', () => {
       throw new Error('Unknown repository');
     });
 
-    auditLogService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditLogService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
     container.registerInstance(CreateAuditLogService, auditLogService);
 
     service = container.resolve(PendingOrderService);
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(manager));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(manager),
+    );
   });
 
   it('should mark order as pending successfully', async () => {
-    inventoryRepo.find.mockResolvedValue([{ id: 1, storedQuantity: 10 } as unknown as Inventory]);
+    inventoryRepo.find.mockResolvedValue([
+      { id: 1, storedQuantity: 10 } as unknown as Inventory,
+    ]);
     orderItemRepo.find.mockResolvedValue([]);
-    orderRepo.save.mockResolvedValue({ ...order, status: OrderStatus.PENDING } as Order);
+    orderRepo.save.mockResolvedValue({
+      ...order,
+      status: OrderStatus.PENDING,
+    } as Order);
 
     const result = await service.handle(order, dto, mockUser);
 
@@ -102,8 +121,12 @@ describe('PendingOrderService', () => {
   });
 
   it('should soft delete removed order items', async () => {
-    inventoryRepo.find.mockResolvedValue([{ id: 1, storedQuantity: 10 } as unknown as Inventory]);
-    orderItemRepo.find.mockResolvedValue([{ id: 10, inventorySourceId: 2 } as unknown as OrderItem]);
+    inventoryRepo.find.mockResolvedValue([
+      { id: 1, storedQuantity: 10 } as unknown as Inventory,
+    ]);
+    orderItemRepo.find.mockResolvedValue([
+      { id: 10, inventorySourceId: 2 } as unknown as OrderItem,
+    ]);
     orderRepo.save.mockResolvedValue(order);
 
     await service.handle(order, dto, mockUser);
@@ -112,8 +135,16 @@ describe('PendingOrderService', () => {
   });
 
   it('should restore soft deleted items', async () => {
-    inventoryRepo.find.mockResolvedValue([{ id: 1, storedQuantity: 10 } as unknown as Inventory]);
-    orderItemRepo.find.mockResolvedValue([{ id: 5, inventorySourceId: 1, deletedAt: new Date() } as unknown as OrderItem]);
+    inventoryRepo.find.mockResolvedValue([
+      { id: 1, storedQuantity: 10 } as unknown as Inventory,
+    ]);
+    orderItemRepo.find.mockResolvedValue([
+      {
+        id: 5,
+        inventorySourceId: 1,
+        deletedAt: new Date(),
+      } as unknown as OrderItem,
+    ]);
     orderRepo.save.mockResolvedValue(order);
 
     await service.handle(order, dto, mockUser);
@@ -122,26 +153,36 @@ describe('PendingOrderService', () => {
   });
 
   it('should throw ValidationException if order is already completed', async () => {
-    await expect(service.handle({ ...order, status: OrderStatus.COMPLETED }, dto, mockUser))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(
+        { ...order, status: OrderStatus.COMPLETED },
+        dto,
+        mockUser,
+      ),
+    ).rejects.toBeInstanceOf(ValidationException);
   });
 
   it('should throw ValidationException if order code is already used', async () => {
     orderRepo.findOne.mockResolvedValue({ id: 2 } as unknown as Order);
 
-    await expect(service.handle(order, { ...dto, code: 'NEWCODE' }, mockUser))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(order, { ...dto, code: 'NEWCODE' }, mockUser),
+    ).rejects.toBeInstanceOf(ValidationException);
   });
 
   it('should throw ValidationException if inventory not found', async () => {
     inventoryRepo.find.mockResolvedValue([]);
-    await expect(service.handle(order, dto, mockUser))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(service.handle(order, dto, mockUser)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
   });
 
   it('should throw ValidationException if inventory stock insufficient', async () => {
-    inventoryRepo.find.mockResolvedValue([{ id: 1, storedQuantity: 2 } as unknown as Inventory]);
-    await expect(service.handle(order, dto, mockUser))
-      .rejects.toBeInstanceOf(ValidationException);
+    inventoryRepo.find.mockResolvedValue([
+      { id: 1, storedQuantity: 2 } as unknown as Inventory,
+    ]);
+    await expect(service.handle(order, dto, mockUser)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
   });
 });

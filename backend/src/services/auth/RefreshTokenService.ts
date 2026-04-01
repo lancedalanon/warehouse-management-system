@@ -12,7 +12,7 @@ export class RefreshTokenService {
     private readonly refreshTokenRepo: Repository<RefreshToken>,
 
     @inject(JwtService)
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   async handle(refreshTokenString: string) {

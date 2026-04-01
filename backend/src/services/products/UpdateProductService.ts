@@ -46,9 +46,10 @@ export class UpdateProductService implements BaseService {
       });
 
       if (existing) {
-        throw new ValidationHandler(
-          { field: 'sku', message: 'SKU was already assigned to another product'}
-        );
+        throw new ValidationHandler({
+          field: 'sku',
+          message: 'SKU was already assigned to another product',
+        });
       }
     }
 

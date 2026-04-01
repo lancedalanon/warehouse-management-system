@@ -16,7 +16,7 @@ export class StoreInventoryService implements BaseService {
   constructor(
     @inject(CreateAuditLogService)
     private readonly createAuditLogService: CreateAuditLogService,
-    
+
     @inject(CreateInventoryMovementService)
     private readonly createInventoryMovementService: CreateInventoryMovementService,
 
@@ -36,9 +36,10 @@ export class StoreInventoryService implements BaseService {
 
     // Validation for stored quantity must be greater than or equal to 0
     if (storedQuantity == null || storedQuantity < 0) {
-      throw new ValidationHandler(
-        { field: 'storedQuantity', message: 'Stored quantity must be greater than 0'}
-      );
+      throw new ValidationHandler({
+        field: 'storedQuantity',
+        message: 'Stored quantity must be greater than 0',
+      });
     }
 
     const product = await this.productRepo.findOne({
@@ -48,9 +49,10 @@ export class StoreInventoryService implements BaseService {
 
     // Validation for stored quantity cannot exceed received quantity
     if (storedQuantity > product.receivedQuantity) {
-      throw new ValidationHandler(
-        { field: 'storedQuantity', message: `Stored quantity (${storedQuantity}) cannot exceed received quantity (${product.receivedQuantity})`}
-      );
+      throw new ValidationHandler({
+        field: 'storedQuantity',
+        message: `Stored quantity (${storedQuantity}) cannot exceed received quantity (${product.receivedQuantity})`,
+      });
     }
 
     const oldInventory = { ...inventory };

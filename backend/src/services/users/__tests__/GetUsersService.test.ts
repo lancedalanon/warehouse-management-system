@@ -84,9 +84,12 @@ describe('GetUsersService', () => {
 
     expect(qb.andWhere).toHaveBeenCalledWith('user.id = :id', { id: 1 });
 
-    expect(qb.andWhere).toHaveBeenCalledWith('user.firstName ILIKE :firstName', {
-      firstName: '%John%',
-    });
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'user.firstName ILIKE :firstName',
+      {
+        firstName: '%John%',
+      },
+    );
 
     expect(qb.andWhere).toHaveBeenCalledWith('user.lastName ILIKE :lastName', {
       lastName: '%Doe%',

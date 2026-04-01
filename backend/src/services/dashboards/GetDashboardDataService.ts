@@ -23,7 +23,7 @@ const RANGE_SQL = {
 export class GetDashboardDataService implements BaseService {
   constructor(
     @inject('InventoryMovementRepository')
-    private readonly inventoryMovementRepo: Repository<InventoryMovement>
+    private readonly inventoryMovementRepo: Repository<InventoryMovement>,
   ) {}
 
   async handle(req: Request): Promise<DashboardData> {

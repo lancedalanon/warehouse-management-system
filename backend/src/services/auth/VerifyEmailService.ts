@@ -11,7 +11,7 @@ export class VerifyEmailService {
     @inject(EmailVerifyService)
     private readonly emailVerifyService: EmailVerifyService,
 
-    @inject('UserRepository') 
+    @inject('UserRepository')
     private readonly userRepo: Repository<User>,
   ) {}
 

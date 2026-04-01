@@ -89,9 +89,7 @@ describe('DeleteUserService', () => {
   it('should throw NotFoundException if user does not exist', async () => {
     userRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, user))
-      .rejects
-      .toThrow(NotFoundException);
+    await expect(service.handle(999, user)).rejects.toThrow(NotFoundException);
 
     expect(userRepo.softRemove).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();

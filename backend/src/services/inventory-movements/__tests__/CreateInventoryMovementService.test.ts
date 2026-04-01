@@ -56,7 +56,9 @@ describe('CreateInventoryMovementService', () => {
 
     const result = await service.handle(dto);
 
-    expect(inventoryRepo.findOne).toHaveBeenCalledWith({ where: { id: dto.inventoryId } });
+    expect(inventoryRepo.findOne).toHaveBeenCalledWith({
+      where: { id: dto.inventoryId },
+    });
     expect(movementRepo.create).toHaveBeenCalledWith({
       inventoryId: dto.inventoryId,
       productId: dto.productId,
@@ -121,7 +123,9 @@ describe('CreateInventoryMovementService', () => {
 
     await expect(service.handle(dto)).rejects.toThrow(NotFoundException);
 
-    expect(inventoryRepo.findOne).toHaveBeenCalledWith({ where: { id: dto.inventoryId } });
+    expect(inventoryRepo.findOne).toHaveBeenCalledWith({
+      where: { id: dto.inventoryId },
+    });
     expect(movementRepo.create).not.toHaveBeenCalled();
     expect(movementRepo.save).not.toHaveBeenCalled();
   });

@@ -1,12 +1,7 @@
 'use client';
 
 import { type FC } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { CreateOrderForm } from './CreateOrderForm';
 import type { Order } from '@/features/orders/types/order.types';
@@ -46,18 +41,11 @@ export const OrderFormDialog: FC<Props> = ({
         </DialogHeader>
 
         {actionType === 'create' && (
-          <CreateOrderForm
-            onSuccess={onSuccess}
-            resetDialog={resetDialog}
-          />
+          <CreateOrderForm onSuccess={onSuccess} resetDialog={resetDialog} />
         )}
 
         {actionType === 'edit' && initialData && (
-          <UpdateOrderForm
-            order={initialData}
-            onSuccess={onSuccess}
-            resetDialog={resetDialog}
-          />
+          <UpdateOrderForm order={initialData} onSuccess={onSuccess} resetDialog={resetDialog} />
         )}
       </DialogContent>
     </Dialog>

@@ -27,7 +27,9 @@ describe('CreateLocationService', () => {
       save: jest.fn(),
     } as unknown as jest.Mocked<Repository<Location>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
 
     container.registerInstance('LocationRepository', locationRepo);
     container.registerInstance(CreateAuditLogService, auditService);
@@ -38,7 +40,12 @@ describe('CreateLocationService', () => {
   });
 
   it('should create location successfully', async () => {
-    const dto = { code: 'LOC001', name: 'Main Warehouse', type: 'Warehouse', capacity: '100 kg' };
+    const dto = {
+      code: 'LOC001',
+      name: 'Main Warehouse',
+      type: 'Warehouse',
+      capacity: '100 kg',
+    };
 
     locationRepo.findOne.mockResolvedValue(null);
     locationRepo.create.mockReturnValue(mockLocation);
@@ -59,25 +66,37 @@ describe('CreateLocationService', () => {
 
     const result = await service.handle(dto, user);
 
-    expect(locationRepo.findOne).toHaveBeenCalledWith({ where: { code: 'LOC001' }, withDeleted: true });
+    expect(locationRepo.findOne).toHaveBeenCalledWith({
+      where: { code: 'LOC001' },
+      withDeleted: true,
+    });
     expect(locationRepo.create).toHaveBeenCalledWith(dto);
     expect(locationRepo.save).toHaveBeenCalledWith(mockLocation);
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'LOCATION_CREATED',
-      auditableType: 'Location',
-      auditableId: 1,
-      userId: 1,
-      newValues: expect.objectContaining({ code: 'LOC001' }),
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'LOCATION_CREATED',
+        auditableType: 'Location',
+        auditableId: 1,
+        userId: 1,
+        newValues: expect.objectContaining({ code: 'LOC001' }),
+      }),
+    );
     expect(result).toEqual(mockLocation);
   });
 
   it('should throw ValidationException if code exists', async () => {
     locationRepo.findOne.mockResolvedValue(mockLocation);
 
-    const dto = { code: 'LOC001', name: 'Another Location', type: 'Warehouse', capacity: '50 kg' };
+    const dto = {
+      code: 'LOC001',
+      name: 'Another Location',
+      type: 'Warehouse',
+      capacity: '50 kg',
+    };
 
-    await expect(service.handle(dto)).rejects.toBeInstanceOf(ValidationException);
+    await expect(service.handle(dto)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
 
     expect(locationRepo.create).not.toHaveBeenCalled();
     expect(locationRepo.save).not.toHaveBeenCalled();
@@ -85,8 +104,19 @@ describe('CreateLocationService', () => {
   });
 
   it('should set capacity to null when not provided', async () => {
-    const dto = { code: 'LOC003', name: 'Tertiary Warehouse', type: 'Bin', capacity: null };
-    const locationWithNullCapacity = { ...mockLocation, id: 3, code: 'LOC003', name: 'Tertiary Warehouse', capacity: null };
+    const dto = {
+      code: 'LOC003',
+      name: 'Tertiary Warehouse',
+      type: 'Bin',
+      capacity: null,
+    };
+    const locationWithNullCapacity = {
+      ...mockLocation,
+      id: 3,
+      code: 'LOC003',
+      name: 'Tertiary Warehouse',
+      capacity: null,
+    };
 
     locationRepo.findOne.mockResolvedValue(null);
     locationRepo.create.mockReturnValue(locationWithNullCapacity as Location);

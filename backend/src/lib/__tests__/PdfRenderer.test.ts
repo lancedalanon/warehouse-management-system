@@ -14,7 +14,7 @@ const mockCreatePdfKitDocument = jest.fn();
 jest.mock('pdfmake/src/printer', () =>
   jest.fn().mockImplementation(() => ({
     createPdfKitDocument: mockCreatePdfKitDocument,
-  }))
+  })),
 );
 
 jest.mock('jsdom', () => ({
@@ -72,21 +72,21 @@ describe('PdfRenderer', () => {
   it('should render using a relative template path', async () => {
     mockedReadFile.mockResolvedValue('<h1>{{title}}</h1>');
     mockedCompile.mockReturnValue(jest.fn().mockReturnValue('<h1>Hello</h1>'));
-    
+
     const renderer = new PdfRenderer();
     await renderer.render({ template: 'test.hbs', data: {} });
 
     // Verifies path.join was used because 'test.hbs' is not absolute
     expect(mockedReadFile).toHaveBeenCalledWith(
-      expect.stringContaining(path.join('templates', 'test.hbs')), 
-      'utf8'
+      expect.stringContaining(path.join('templates', 'test.hbs')),
+      'utf8',
     );
   });
 
   it('should render using an absolute template path', async () => {
     mockedReadFile.mockResolvedValue('<h1>{{title}}</h1>');
     mockedCompile.mockReturnValue(jest.fn().mockReturnValue('<h1>Hello</h1>'));
-    
+
     const absolutePath = path.resolve('/absolute/path/to/template.hbs');
     const renderer = new PdfRenderer();
     await renderer.render({ template: absolutePath, data: {} });

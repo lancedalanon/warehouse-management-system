@@ -179,7 +179,11 @@ router.get(
   '/',
   authenticate,
   verifiedEmailOnly,
-  authorizeRoles([Role.SUPERADMIN, Role.INVENTORY_STAFF, Role.WAREHOUSE_MANAGER]),
+  authorizeRoles([
+    Role.SUPERADMIN,
+    Role.INVENTORY_STAFF,
+    Role.WAREHOUSE_MANAGER,
+  ]),
   orderController.getOrders,
 );
 
@@ -209,7 +213,11 @@ router.get(
   '/:id',
   authenticate,
   verifiedEmailOnly,
-  authorizeRoles([Role.SUPERADMIN, Role.INVENTORY_STAFF, Role.WAREHOUSE_MANAGER]),
+  authorizeRoles([
+    Role.SUPERADMIN,
+    Role.INVENTORY_STAFF,
+    Role.WAREHOUSE_MANAGER,
+  ]),
   orderController.getOrder,
 );
 
@@ -237,7 +245,11 @@ router.post(
   '/',
   authenticate,
   verifiedEmailOnly,
-  authorizeRoles([Role.SUPERADMIN, Role.INVENTORY_STAFF, Role.WAREHOUSE_MANAGER]),
+  authorizeRoles([
+    Role.SUPERADMIN,
+    Role.INVENTORY_STAFF,
+    Role.WAREHOUSE_MANAGER,
+  ]),
   orderController.createOrder,
 );
 
@@ -275,7 +287,11 @@ router.put(
   '/:id',
   authenticate,
   verifiedEmailOnly,
-  authorizeRoles([Role.SUPERADMIN, Role.INVENTORY_STAFF, Role.WAREHOUSE_MANAGER]),
+  authorizeRoles([
+    Role.SUPERADMIN,
+    Role.INVENTORY_STAFF,
+    Role.WAREHOUSE_MANAGER,
+  ]),
   orderController.updateOrder,
 );
 
@@ -301,7 +317,11 @@ router.delete(
   '/:id',
   authenticate,
   verifiedEmailOnly,
-  authorizeRoles([Role.SUPERADMIN, Role.INVENTORY_STAFF, Role.WAREHOUSE_MANAGER]),
+  authorizeRoles([
+    Role.SUPERADMIN,
+    Role.INVENTORY_STAFF,
+    Role.WAREHOUSE_MANAGER,
+  ]),
   orderController.deleteOrder,
 );
 

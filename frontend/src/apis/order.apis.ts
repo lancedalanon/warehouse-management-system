@@ -31,9 +31,7 @@ export const getOrdersApi = async (
 /**
  * POST /api/orders
  */
-export const createOrderApi = async (
-  payload: OrderCreatePayload,
-): Promise<Order> => {
+export const createOrderApi = async (payload: OrderCreatePayload): Promise<Order> => {
   const res = await axios.post<ApiResponse<Order>>('/orders', payload);
 
   return res.data.data;
@@ -42,9 +40,7 @@ export const createOrderApi = async (
 /**
  * GET /api/orders/{id}
  */
-export const getOrderApi = async (
-  id: number | string,
-): Promise<Order> => {
+export const getOrderApi = async (id: number | string): Promise<Order> => {
   const res = await axios.get<ApiResponse<Order>>(`/orders/${id}`);
 
   return res.data.data;
@@ -57,10 +53,7 @@ export const updateOrderApi = async (
   id: number | string,
   payload: OrderUpdatePayload,
 ): Promise<Order> => {
-  const res = await axios.put<ApiResponse<Order>>(
-    `/orders/${id}`,
-    payload,
-  );
+  const res = await axios.put<ApiResponse<Order>>(`/orders/${id}`, payload);
 
   return res.data.data;
 };

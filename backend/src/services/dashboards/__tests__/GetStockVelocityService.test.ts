@@ -13,7 +13,9 @@ describe('GetStockVelocityService', () => {
 
   it('should calculate average per day and stock growth', async () => {
     // Suppose 50 inbound, 20 outbound
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([{ inbound: 50, outbound: 20 }]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: 50, outbound: 20 }]);
 
     const req = {
       query: { dateRange: 'weekly' },
@@ -28,7 +30,9 @@ describe('GetStockVelocityService', () => {
   });
 
   it('should fallback to weekly when invalid dateRange', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([{ inbound: 14, outbound: 7 }]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: 14, outbound: 7 }]);
 
     const req = {
       query: { dateRange: 'invalid-range' },
@@ -40,7 +44,9 @@ describe('GetStockVelocityService', () => {
   });
 
   it('should return zero values when query returns null', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([{ inbound: null, outbound: null }]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: null, outbound: null }]);
 
     const req = {
       query: { dateRange: 'monthly' },
@@ -56,7 +62,9 @@ describe('GetStockVelocityService', () => {
   });
 
   it('should support yearly dateRange', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([{ inbound: 365, outbound: 100 }]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: 365, outbound: 100 }]);
 
     const req = {
       query: { dateRange: 'yearly' },

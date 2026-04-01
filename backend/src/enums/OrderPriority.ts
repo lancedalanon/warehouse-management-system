@@ -4,8 +4,4 @@ export enum OrderPriority {
   HIGH = 'high',
 }
 
-export const OrderPriorities = [
-  'low',
-  'medium',
-  'high',
-] as const;
+export const OrderPriorities = ['low', 'medium', 'high'] as const;

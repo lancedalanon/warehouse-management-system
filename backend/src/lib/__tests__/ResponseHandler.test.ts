@@ -16,7 +16,7 @@ describe('ResponseHandler', () => {
       status: statusMock,
       locals: {}, // Starting with empty locals
     };
-    
+
     // Freeze time for consistent timestamps
     jest.useFakeTimers().setSystemTime(new Date('2026-01-01T00:00:00Z'));
   });
@@ -29,8 +29,10 @@ describe('ResponseHandler', () => {
   describe('success()', () => {
     it('should return a 200 success response with custom requestId from locals', () => {
       mockResponse.locals = { req: { requestId: 'custom-id' } };
-      
-      ResponseHandler.success(mockResponse as Response, 'Great success', { id: 1 });
+
+      ResponseHandler.success(mockResponse as Response, 'Great success', {
+        id: 1,
+      });
 
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
@@ -49,60 +51,78 @@ describe('ResponseHandler', () => {
       // res.locals is empty, so it should use the mocked uuidv4()
       ResponseHandler.success(mockResponse as Response, 'Generated ID');
 
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({
-        requestId: 'mocked-uuid-123'
-      }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          requestId: 'mocked-uuid-123',
+        }),
+      );
     });
   });
 
   describe('Error static methods', () => {
     // We can test one thoroughly and the rest briefly to ensure they map correctly
     it('should handle internalError correctly', () => {
-      ResponseHandler.internalError(mockResponse as Response, 'Server boom', { detail: 'stack trace' });
+      ResponseHandler.internalError(mockResponse as Response, 'Server boom', {
+        detail: 'stack trace',
+      });
 
       expect(statusMock).toHaveBeenCalledWith(500);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({
-        success: false,
-        status: ErrorCode.INTERNAL_ERROR,
-        message: 'Server boom',
-        error: { detail: 'stack trace' }
-      }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          status: ErrorCode.INTERNAL_ERROR,
+          message: 'Server boom',
+          error: { detail: 'stack trace' },
+        }),
+      );
     });
 
     it('should handle notFound correctly', () => {
       ResponseHandler.notFound(mockResponse as Response);
       expect(statusMock).toHaveBeenCalledWith(404);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ status: ErrorCode.NOT_FOUND }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({ status: ErrorCode.NOT_FOUND }),
+      );
     });
 
     it('should handle badRequest correctly', () => {
       ResponseHandler.badRequest(mockResponse as Response);
       expect(statusMock).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ status: ErrorCode.BAD_REQUEST }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({ status: ErrorCode.BAD_REQUEST }),
+      );
     });
 
     it('should handle validationError correctly', () => {
       ResponseHandler.validationError(mockResponse as Response);
       expect(statusMock).toHaveBeenCalledWith(422);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ status: ErrorCode.VALIDATION_ERROR }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({ status: ErrorCode.VALIDATION_ERROR }),
+      );
     });
 
     it('should handle unauthorized correctly', () => {
       ResponseHandler.unauthorized(mockResponse as Response);
       expect(statusMock).toHaveBeenCalledWith(401);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ status: ErrorCode.UNAUTHORIZED }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({ status: ErrorCode.UNAUTHORIZED }),
+      );
     });
 
     it('should handle forbidden correctly', () => {
       ResponseHandler.forbidden(mockResponse as Response);
       expect(statusMock).toHaveBeenCalledWith(403);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ status: ErrorCode.FORBIDDEN }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({ status: ErrorCode.FORBIDDEN }),
+      );
     });
 
     it('should handle conflict correctly', () => {
       ResponseHandler.conflict(mockResponse as Response);
       expect(statusMock).toHaveBeenCalledWith(409);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ status: ErrorCode.CONFLICT }));
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({ status: ErrorCode.CONFLICT }),
+      );
     });
   });
 });

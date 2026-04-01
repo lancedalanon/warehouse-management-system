@@ -42,7 +42,9 @@ describe('UpdateProductService', () => {
       save: jest.fn(),
     } as unknown as jest.Mocked<Repository<Product>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
 
     container.registerInstance('ProductRepository', productRepo);
     container.registerInstance(CreateAuditLogService, auditService);
@@ -57,7 +59,7 @@ describe('UpdateProductService', () => {
       sku: 'SKU456',
       name: 'Updated Product',
       description: 'Updated description',
-      unitType: 'box'
+      unitType: 'box',
     };
 
     productRepo.findOne.mockImplementation(({ where } = {}) => {
@@ -73,21 +75,29 @@ describe('UpdateProductService', () => {
 
     const result = await service.handle(existingProduct.id, dto, user);
 
-    expect(productRepo.findOne).toHaveBeenCalledWith({ where: { id: existingProduct.id } });
+    expect(productRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingProduct.id },
+    });
     expect(productRepo.save).toHaveBeenCalledWith(expect.objectContaining(dto));
     expect(auditService.handle).toHaveBeenCalledWith(
-    expect.objectContaining({ 
-      auditableId: existingProduct.id,
-        event: 'PRODUCT_UPDATED'
-    }));
+      expect.objectContaining({
+        auditableId: existingProduct.id,
+        event: 'PRODUCT_UPDATED',
+      }),
+    );
     expect(result).toEqual({ ...existingProduct, ...dto });
   });
 
   it('should throw NotFoundException if product does not exist', async () => {
     productRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, { sku: 'SKU999', name: 'X', unitType: 'pcs', description: null }, user))
-      .rejects.toBeInstanceOf(NotFoundException);
+    await expect(
+      service.handle(
+        999,
+        { sku: 'SKU999', name: 'X', unitType: 'pcs', description: null },
+        user,
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException);
 
     expect(productRepo.save).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();
@@ -98,10 +108,16 @@ describe('UpdateProductService', () => {
       .mockResolvedValueOnce(existingProduct) // find current product
       .mockResolvedValueOnce({ ...existingProduct, id: 2, sku: 'SKU999' }); // find conflicting SKU
 
-    const dto = { sku: 'SKU999', name: 'Updated', description: 'Desc', unitType: 'pcs' };
+    const dto = {
+      sku: 'SKU999',
+      name: 'Updated',
+      description: 'Desc',
+      unitType: 'pcs',
+    };
 
-    await expect(service.handle(existingProduct.id, dto, user))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(existingProduct.id, dto, user),
+    ).rejects.toBeInstanceOf(ValidationException);
 
     expect(productRepo.save).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();

@@ -1,6 +1,7 @@
 # Warehouse Management System (WMS) - Backend
 
 ## Summary
+
 The Warehouse Management System (WMS) backend is designed to efficiently manage warehouse operations including inventory tracking, order processing, and reporting. It provides a robust RESTful API to interact with warehouse data and ensures data integrity, security, and scalability. The backend serves as the foundation for handling warehouse logic, user management, notifications, and documentation.
 
 > **Status:** The application is fully functional as a prototype and can be tested live. Both backend and frontend are actively being improved, including unit tests, feature enhancements, and frontend refinements.
@@ -8,35 +9,45 @@ The Warehouse Management System (WMS) backend is designed to efficiently manage 
 ## Technology Stack
 
 ### Node.js
+
 A JavaScript runtime built on Chrome's V8 engine, Node.js allows the backend to run efficiently and handle asynchronous operations with high performance.
 
 ### Express.js
+
 A minimal and flexible Node.js web application framework, Express.js provides a robust set of features for building RESTful APIs and handling routing, middleware, and HTTP requests.
 
 ### PostgreSQL
+
 A powerful open-source relational database system used to store warehouse data including inventory, users, and transactions. It ensures data integrity and supports complex queries.
 
 ### TypeScript
+
 A statically typed superset of JavaScript, TypeScript improves code quality and maintainability by enabling type safety, autocompletion, and better tooling support.
 
 ### Zod
+
 A TypeScript-first schema validation library used to validate and parse incoming data, ensuring that API requests meet expected formats and types.
 
 ### TypeORM
+
 An Object-Relational Mapping (ORM) library for TypeScript and JavaScript, TypeORM simplifies database interactions and allows defining database models as TypeScript classes.
 
 ### Nodemailer
+
 A module for Node.js applications to send emails. Used in the system for notifications such as account verification, alerts, or reports.
 
 ### Swagger / OpenAPI
+
 Used to automatically generate API documentation for the backend, making it easier for developers to understand and test endpoints.
 
 ### Docker
+
 Containerization platform used to run the backend and database in isolated environments, simplifying setup and deployment.
 
 ## Features
 
 ### Authentication
+
 - User login, logout, and session management
 - Access token refresh
 - Password reset and change
@@ -44,6 +55,7 @@ Containerization platform used to run the backend and database in isolated envir
 - Invitation requests
 
 ### Orders
+
 - Create, update, and delete orders
 - Manage order statuses: Pending, Confirmed, Completed, Cancelled
 - Add or remove items from orders as needed
@@ -51,41 +63,50 @@ Containerization platform used to run the backend and database in isolated envir
 - Paginated listing and detailed viewing of orders
 
 ### Inventory Movements
+
 - View inventory movement history with pagination
 - Track stock changes across actions
 
 ### Inventories
+
 - Create, update, and delete inventory records
 - Perform inventory actions such as set available, reserve, ship, transfer, or write off
 - Paginated listing and detailed viewing of inventories
 
 ### Invitation Requests
+
 - Manage and review invitation requests
 - Approve or decline requests
 - Paginated listing and detailed viewing
 
 ### Locations
+
 - Create, update, delete, and view warehouse locations
 - Paginated listing of locations
 
 ### Products
+
 - Create, update, delete, and view products
 - Manage product stock, including receiving new quantities
 - Paginated listing of products
 
 ### Roles
+
 - View and manage roles within the system
 - Retrieve role details
 
 ### Users
+
 - Create, update, delete, and view users
 - Paginated listing of users
 
 ### Dashboard
+
 - Access dashboard data for insights
 - Export dashboard reports
 
 ### Health Check
+
 - Endpoint to check the health status of the backend
 
 ## Project Structure
@@ -171,6 +192,7 @@ cd backend
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 ```
@@ -246,7 +268,7 @@ You can run the backend using Docker instead of setting it up manually.
 
 ### 1. Prerequisites
 
-- Ensure Docker is installed (Docker Desktop is recommended).  
+- Ensure Docker is installed (Docker Desktop is recommended).
 - Update your `.env` file to change the database host:
 
 ```bash
@@ -283,17 +305,20 @@ docker compose down
 ## Contact, Licensing & Acknowledgements
 
 ### Contact
+
 For any questions or feedback, feel free to reach out:
 
-- **Email:** lanceorville5@gmail.com  
+- **Email:** lanceorville5@gmail.com
 - **GitHub:** [lancedalanon](https://github.com/lancedalanon)
 
 > This is a personal project. Contributions are not accepted at the current moment.
 
 ### Licensing
+
 This project is for personal use. All rights reserved.
 
 ### Acknowledgements
+
 This project uses the following libraries and technologies. For more information or official documentation, please refer to their respective sites:
 
 - [Node.js](https://nodejs.org/)

@@ -37,7 +37,9 @@ describe('DeleteProductService', () => {
       softRemove: jest.fn(),
     } as unknown as jest.Mocked<Repository<Product>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
 
     container.registerInstance('ProductRepository', productRepo);
     container.registerInstance(CreateAuditLogService, auditService);
@@ -50,25 +52,29 @@ describe('DeleteProductService', () => {
   it('should soft delete a product successfully', async () => {
     productRepo.findOne.mockResolvedValue(existingProduct);
     productRepo.softRemove.mockImplementation((p) =>
-        Promise.resolve({
-            ...existingProduct, // ensures id, sku, etc. are present
-            ...p,               // include any updates from the call
-        } as Product)
+      Promise.resolve({
+        ...existingProduct, // ensures id, sku, etc. are present
+        ...p, // include any updates from the call
+      } as Product),
     );
 
     const result = await service.handle(existingProduct.id, user);
 
     // Repository calls
-    expect(productRepo.findOne).toHaveBeenCalledWith({ where: { id: existingProduct.id } });
+    expect(productRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingProduct.id },
+    });
     expect(productRepo.softRemove).toHaveBeenCalledWith(existingProduct);
 
     // Audit log
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'PRODUCT_DELETED',
-      auditableId: existingProduct.id,
-      userId: user.sub,
-      oldValues: existingProduct,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'PRODUCT_DELETED',
+        auditableId: existingProduct.id,
+        userId: user.sub,
+        oldValues: existingProduct,
+      }),
+    );
 
     expect(result).toEqual(existingProduct);
   });
@@ -76,9 +82,7 @@ describe('DeleteProductService', () => {
   it('should throw NotFoundException if product does not exist', async () => {
     productRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, user))
-      .rejects
-      .toThrow(NotFoundException);
+    await expect(service.handle(999, user)).rejects.toThrow(NotFoundException);
 
     expect(productRepo.softRemove).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();

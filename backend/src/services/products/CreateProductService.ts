@@ -38,9 +38,10 @@ export class CreateProductService implements BaseService {
     });
 
     if (existing) {
-      throw new ValidationHandler(
-        { field: 'sku', message: 'SKU was already assigned to another product'}
-      );
+      throw new ValidationHandler({
+        field: 'sku',
+        message: 'SKU was already assigned to another product',
+      });
     }
 
     // Create and save the new product

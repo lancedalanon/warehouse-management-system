@@ -34,7 +34,9 @@ describe('DeclineInvitationRequestService', () => {
 
     const result = await service.handle(mockInvitation.id);
 
-    expect(invitationRepo.findOne).toHaveBeenCalledWith({ where: { id: mockInvitation.id } });
+    expect(invitationRepo.findOne).toHaveBeenCalledWith({
+      where: { id: mockInvitation.id },
+    });
     expect(invitationRepo.save).toHaveBeenCalled();
     expect(result.declinedAt).toBeInstanceOf(Date);
   });

@@ -12,9 +12,9 @@ describe('GetNetStockService', () => {
   });
 
   it('should return inbound, outbound and netStock', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([
-      { inbound: 50, outbound: 20 },
-    ]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: 50, outbound: 20 }]);
 
     const req = {
       query: { dateRange: 'weekly' },
@@ -32,9 +32,9 @@ describe('GetNetStockService', () => {
   });
 
   it('should fallback to weekly when invalid dateRange is provided', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([
-      { inbound: 10, outbound: 5 },
-    ]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: 10, outbound: 5 }]);
 
     const req = {
       query: { dateRange: 'invalid-range' },
@@ -46,9 +46,9 @@ describe('GetNetStockService', () => {
   });
 
   it('should return zero values when query returns null', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([
-      { inbound: null, outbound: null },
-    ]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: null, outbound: null }]);
 
     const req = {
       query: { dateRange: 'monthly' },
@@ -64,9 +64,9 @@ describe('GetNetStockService', () => {
   });
 
   it('should support yearly dateRange', async () => {
-    jest.spyOn(AppDataSource, 'query').mockResolvedValue([
-      { inbound: 100, outbound: 40 },
-    ]);
+    jest
+      .spyOn(AppDataSource, 'query')
+      .mockResolvedValue([{ inbound: 100, outbound: 40 }]);
 
     const req = {
       query: { dateRange: 'yearly' },

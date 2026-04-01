@@ -112,7 +112,11 @@ describe('UpdateInventoryService', () => {
 
     const result = await service.handle(1, dto, mockUser);
 
-    expect(transferService.handle).toHaveBeenCalledWith(inventory, dto, mockUser);
+    expect(transferService.handle).toHaveBeenCalledWith(
+      inventory,
+      dto,
+      mockUser,
+    );
     expect(result).toBe(inventory);
   });
 
@@ -124,7 +128,11 @@ describe('UpdateInventoryService', () => {
 
     const result = await service.handle(1, dto, mockUser);
 
-    expect(writeOffService.handle).toHaveBeenCalledWith(inventory, dto, mockUser);
+    expect(writeOffService.handle).toHaveBeenCalledWith(
+      inventory,
+      dto,
+      mockUser,
+    );
     expect(result).toBe(inventory);
   });
 

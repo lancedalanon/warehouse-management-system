@@ -76,7 +76,7 @@ describe('UpdateUserService', () => {
       lastName: 'Smith',
       suffix: null,
       email: 'jane@example.com',
-      roleId: existingRole.id
+      roleId: existingRole.id,
     };
 
     userRepo.findOne.mockImplementation(({ where } = {}) => {
@@ -130,14 +130,18 @@ describe('UpdateUserService', () => {
     userRepo.findOne.mockResolvedValue(null);
 
     await expect(
-      service.handle(999, {
-        firstName: 'Test',
-        middleName: null,
-        lastName: 'User',
-        suffix: null,
-        email: 'test@example.com',
-        roleId: 2,
-      }, user),
+      service.handle(
+        999,
+        {
+          firstName: 'Test',
+          middleName: null,
+          lastName: 'User',
+          suffix: null,
+          email: 'test@example.com',
+          roleId: 2,
+        },
+        user,
+      ),
     ).rejects.toBeInstanceOf(NotFoundException);
 
     expect(userRepo.save).not.toHaveBeenCalled();
@@ -158,8 +162,9 @@ describe('UpdateUserService', () => {
       roleId: 2,
     };
 
-    await expect(service.handle(existingUser.id, dto, user))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(existingUser.id, dto, user),
+    ).rejects.toBeInstanceOf(ValidationException);
 
     expect(userRepo.save).not.toHaveBeenCalled();
   });
@@ -177,8 +182,9 @@ describe('UpdateUserService', () => {
       roleId: 999,
     };
 
-    await expect(service.handle(existingUser.id, dto, user))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(existingUser.id, dto, user),
+    ).rejects.toBeInstanceOf(ValidationException);
 
     expect(userRepo.save).not.toHaveBeenCalled();
   });
@@ -200,8 +206,9 @@ describe('UpdateUserService', () => {
       roleId: 1,
     };
 
-    await expect(service.handle(existingUser.id, dto, user))
-      .rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(existingUser.id, dto, user),
+    ).rejects.toBeInstanceOf(ValidationException);
 
     expect(userRepo.save).not.toHaveBeenCalled();
   });

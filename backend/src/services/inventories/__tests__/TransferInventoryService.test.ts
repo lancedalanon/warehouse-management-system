@@ -50,7 +50,11 @@ describe('TransferInventoryService', () => {
     updatedAt: new Date(),
   } as unknown as Location;
 
-  const makeTransferDTO = (transferredQuantity: number, locationId: number, notes: string | null = null) => ({
+  const makeTransferDTO = (
+    transferredQuantity: number,
+    locationId: number,
+    notes: string | null = null,
+  ) => ({
     action: InventoryAction.TRANSFER,
     locationId,
     storedQuantity: 0,
@@ -72,8 +76,12 @@ describe('TransferInventoryService', () => {
       findOne: jest.fn(),
     } as unknown as jest.Mocked<Repository<Location>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
-    movementService = { handle: jest.fn() } as unknown as jest.Mocked<CreateInventoryMovementService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
+    movementService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateInventoryMovementService>;
 
     container.registerInstance('InventoryRepository', inventoryRepo);
     container.registerInstance('LocationRepository', locationRepo);
@@ -94,28 +102,37 @@ describe('TransferInventoryService', () => {
     inventoryRepo.findOne
       .mockResolvedValueOnce(null) // target inventory does not exist
       .mockResolvedValueOnce(null) // withDeleted also none -> forces create()
-        .mockResolvedValueOnce({
-          ...inventory,
-          storedQuantity: 30,
-          product: inventory.product,
-          location: { id: 100, name: 'Old Location' },
-        } as Inventory);
+      .mockResolvedValueOnce({
+        ...inventory,
+        storedQuantity: 30,
+        product: inventory.product,
+        location: { id: 100, name: 'Old Location' },
+      } as Inventory);
 
-    inventoryRepo.create.mockReturnValue({ ...inventory, locationId: 200, storedQuantity: 20 } as unknown as Inventory);
-    inventoryRepo.save.mockResolvedValue({ ...inventory, storedQuantity: 30 } as unknown as Inventory);
+    inventoryRepo.create.mockReturnValue({
+      ...inventory,
+      locationId: 200,
+      storedQuantity: 20,
+    } as unknown as Inventory);
+    inventoryRepo.save.mockResolvedValue({
+      ...inventory,
+      storedQuantity: 30,
+    } as unknown as Inventory);
 
     const result = await service.handle(inventory, data, mockUser);
 
     expect(locationRepo.findOne).toHaveBeenCalledWith({ where: { id: 200 } });
     expect(inventoryRepo.save).toHaveBeenCalled();
     expect(inventoryRepo.create).toHaveBeenCalled();
-    expect(movementService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      inventoryId: expect.any(Number),
-      fromLocationId: 100,
-      toLocationId: 200,
-      quantity: 20,
-      notes: 'Test transfer',
-    }));
+    expect(movementService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        inventoryId: expect.any(Number),
+        fromLocationId: 100,
+        toLocationId: 200,
+        quantity: 20,
+        notes: 'Test transfer',
+      }),
+    );
     expect(auditService.handle).toHaveBeenCalledTimes(2);
     expect(result.storedQuantity).toBe(30);
   });
@@ -124,16 +141,18 @@ describe('TransferInventoryService', () => {
     const data = makeTransferDTO(10, 999);
     locationRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(inventory, data, mockUser)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(
+      service.handle(inventory, data, mockUser),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
-  
+
   it('should throw ValidationException if transferredQuantity is invalid', async () => {
     const data = makeTransferDTO(-5, 200);
 
     locationRepo.findOne.mockResolvedValue(mockLocation);
 
     await expect(
-      service.handle(inventory, data, mockUser)
+      service.handle(inventory, data, mockUser),
     ).rejects.toBeInstanceOf(ValidationException);
 
     expect(inventoryRepo.save).not.toHaveBeenCalled();
@@ -144,14 +163,16 @@ describe('TransferInventoryService', () => {
     const data = makeTransferDTO(100, 200);
     locationRepo.findOne.mockResolvedValue(mockLocation);
 
-    await expect(service.handle(inventory, data, mockUser)).rejects.toBeInstanceOf(ValidationException);
+    await expect(
+      service.handle(inventory, data, mockUser),
+    ).rejects.toBeInstanceOf(ValidationException);
   });
 
   it('should throw ValidationException if locationId is invalid', async () => {
     const data = makeTransferDTO(10, 0);
 
     await expect(
-      service.handle(inventory, data, mockUser)
+      service.handle(inventory, data, mockUser),
     ).rejects.toBeInstanceOf(ValidationException);
 
     expect(locationRepo.findOne).not.toHaveBeenCalled();
@@ -163,12 +184,16 @@ describe('TransferInventoryService', () => {
     locationRepo.findOne.mockResolvedValue(mockLocation);
 
     inventoryRepo.findOne
-      .mockResolvedValueOnce({ ...inventory, locationId: 200, storedQuantity: 5 } as Inventory) // existing target
+      .mockResolvedValueOnce({
+        ...inventory,
+        locationId: 200,
+        storedQuantity: 5,
+      } as Inventory) // existing target
       .mockResolvedValueOnce({
         ...inventory,
         storedQuantity: 40,
         product: inventory.product,
-        location: inventory.location
+        location: inventory.location,
       } as Inventory);
 
     inventoryRepo.save.mockResolvedValue({ ...inventory } as Inventory);
@@ -190,12 +215,12 @@ describe('TransferInventoryService', () => {
         productId: 10,
         locationId: 200,
         storedQuantity: 0,
-        deletedAt: new Date()
+        deletedAt: new Date(),
       } as Inventory)
       .mockResolvedValueOnce({
         ...inventory,
         product: inventory.product,
-        location: inventory.location
+        location: inventory.location,
       } as Inventory);
 
     inventoryRepo.save.mockResolvedValue({ ...inventory } as Inventory);

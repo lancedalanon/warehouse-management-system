@@ -41,7 +41,7 @@ describe('CreateAuditLogService', () => {
         auditableType: '',
         auditableId: 0,
         userId: 0,
-      })
+      }),
     ).rejects.toThrow();
   });
 
@@ -94,7 +94,7 @@ describe('CreateAuditLogService', () => {
       expect.objectContaining({
         oldValues: null,
         newValues: null,
-      })
+      }),
     );
   });
 });

@@ -21,9 +21,9 @@ describe('FileStorageHandler', () => {
     it('should default to local storage when FILE_STORAGE is not set', async () => {
       delete process.env.FILE_STORAGE;
       const buffer = Buffer.from('test');
-      
+
       await FileStorageHandler.save(buffer, 'test.txt');
-      
+
       // Verify LocalStorageDriver was instantiated and its save method called
       expect(LocalStorageDriver).toHaveBeenCalled();
     });
@@ -31,44 +31,50 @@ describe('FileStorageHandler', () => {
     it('should throw error for "s3" mode (Not yet implemented)', async () => {
       process.env.FILE_STORAGE = 's3';
       const buffer = Buffer.from('test');
-      
-      await expect(FileStorageHandler.save(buffer, 'path'))
-        .rejects.toThrow('S3 driver not yet implemented');
+
+      await expect(FileStorageHandler.save(buffer, 'path')).rejects.toThrow(
+        'S3 driver not yet implemented',
+      );
     });
 
     it('should throw error for "gcs" mode (Not yet implemented)', async () => {
       process.env.FILE_STORAGE = 'gcs';
       const buffer = Buffer.from('test');
-      
-      await expect(FileStorageHandler.save(buffer, 'path'))
-        .rejects.toThrow('GCS driver not yet implemented');
+
+      await expect(FileStorageHandler.save(buffer, 'path')).rejects.toThrow(
+        'GCS driver not yet implemented',
+      );
     });
 
     it('should throw error for "azure" mode (Not yet implemented)', async () => {
       process.env.FILE_STORAGE = 'azure';
       const buffer = Buffer.from('test');
-      
-      await expect(FileStorageHandler.save(buffer, 'path'))
-        .rejects.toThrow('Azure driver not yet implemented');
+
+      await expect(FileStorageHandler.save(buffer, 'path')).rejects.toThrow(
+        'Azure driver not yet implemented',
+      );
     });
 
     it('should throw error for an unsupported mode', async () => {
       process.env.FILE_STORAGE = 'cloudinary'; // Example of unsupported mode
       const buffer = Buffer.from('test');
-      
-      await expect(FileStorageHandler.save(buffer, 'path'))
-        .rejects.toThrow('Unsupported FILE_STORAGE: cloudinary');
+
+      await expect(FileStorageHandler.save(buffer, 'path')).rejects.toThrow(
+        'Unsupported FILE_STORAGE: cloudinary',
+      );
     });
   });
 
   describe('save() Delegation', () => {
     it('should call the save method of the selected driver', async () => {
       process.env.FILE_STORAGE = 'local';
-      const mockSave = jest.fn().mockResolvedValue({ url: 'http://localhost/file.txt' });
-      
+      const mockSave = jest
+        .fn()
+        .mockResolvedValue({ url: 'http://localhost/file.txt' });
+
       // Setup the mock instance
       (LocalStorageDriver as jest.Mock).mockImplementation(() => ({
-        save: mockSave
+        save: mockSave,
       }));
 
       const buffer = Buffer.from('hello');

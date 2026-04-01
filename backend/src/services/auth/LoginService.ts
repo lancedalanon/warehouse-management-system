@@ -18,7 +18,7 @@ export class LoginService {
     private readonly refreshTokenRepo: Repository<RefreshToken>,
 
     @inject(JwtService)
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   async handle(data: LoginDTO) {

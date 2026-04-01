@@ -6,8 +6,8 @@ import { mailConfig } from '@/mailer';
 jest.mock('@/lib/email/EmailProviderFactory');
 jest.mock('@/mailer', () => ({
   mailConfig: {
-    smtp: { from: 'noreply@test.com', user: 'test-user' }
-  }
+    smtp: { from: 'noreply@test.com', user: 'test-user' },
+  },
 }));
 
 describe('EmailNotificationService', () => {
@@ -15,7 +15,7 @@ describe('EmailNotificationService', () => {
     to: 'user@example.com',
     subject: 'Test Subject',
     text: 'Hello world',
-    html: '<h1>Hello world</h1>'
+    html: '<h1>Hello world</h1>',
   };
 
   beforeEach(() => {
@@ -26,13 +26,13 @@ describe('EmailNotificationService', () => {
     it('should resolve transporter from factory', () => {
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
         transporter: { sendMail: jest.fn() },
-        apiProvider: null
+        apiProvider: null,
       });
 
       const service = new EmailNotificationService();
 
       expect(EmailProviderFactory.resolve).toHaveBeenCalled();
-      
+
       expect(service['transporter']).toBeDefined();
       expect(service['apiProvider']).toBeNull();
     });
@@ -40,7 +40,7 @@ describe('EmailNotificationService', () => {
     it('should resolve apiProvider from factory', () => {
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
         transporter: null,
-        apiProvider: { send: jest.fn() }
+        apiProvider: { send: jest.fn() },
       });
 
       const service = new EmailNotificationService();
@@ -56,7 +56,7 @@ describe('EmailNotificationService', () => {
       const mockSendMail = jest.fn().mockResolvedValue({ messageId: '123' });
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
         transporter: { sendMail: mockSendMail },
-        apiProvider: null
+        apiProvider: null,
       });
 
       const service = new EmailNotificationService();
@@ -72,7 +72,7 @@ describe('EmailNotificationService', () => {
       const mockApiSend = jest.fn().mockResolvedValue(true);
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
         transporter: null,
-        apiProvider: { send: mockApiSend }
+        apiProvider: { send: mockApiSend },
       });
 
       const service = new EmailNotificationService();
@@ -84,22 +84,28 @@ describe('EmailNotificationService', () => {
     it('should throw "No valid mail provider" if both are null', async () => {
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
         transporter: null,
-        apiProvider: null
+        apiProvider: null,
       });
 
       const service = new EmailNotificationService();
-      await expect(service.send(mockParams)).rejects.toThrow('Mailer failed: No valid mail provider resolved');
+      await expect(service.send(mockParams)).rejects.toThrow(
+        'Mailer failed: No valid mail provider resolved',
+      );
     });
 
     it('should wrap and re-throw errors from the providers', async () => {
       const errorMsg = 'Connection timed out';
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
-        transporter: { sendMail: jest.fn().mockRejectedValue(new Error(errorMsg)) },
-        apiProvider: null
+        transporter: {
+          sendMail: jest.fn().mockRejectedValue(new Error(errorMsg)),
+        },
+        apiProvider: null,
       });
 
       const service = new EmailNotificationService();
-      await expect(service.send(mockParams)).rejects.toThrow(`Mailer failed: ${errorMsg}`);
+      await expect(service.send(mockParams)).rejects.toThrow(
+        `Mailer failed: ${errorMsg}`,
+      );
     });
   });
 
@@ -112,15 +118,17 @@ describe('EmailNotificationService', () => {
       const mockSendMail = jest.fn().mockResolvedValue(true);
       (EmailProviderFactory.resolve as jest.Mock).mockReturnValue({
         transporter: { sendMail: mockSendMail },
-        apiProvider: null
+        apiProvider: null,
       });
 
       const service = new EmailNotificationService();
       await service.send(mockParams);
 
-      expect(mockSendMail).toHaveBeenCalledWith(expect.objectContaining({
-        from: 'test-user'
-      }));
+      expect(mockSendMail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: 'test-user',
+        }),
+      );
 
       // Cleanup
       if (mailConfig.smtp) mailConfig.smtp.from = originalFrom;

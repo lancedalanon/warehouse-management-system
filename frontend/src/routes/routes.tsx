@@ -57,7 +57,7 @@ export const routes: RouteConfig[] = [
           { path: 'products', element: <ProductsPage /> },
           { path: 'locations', element: <LocationsPage /> },
           { path: 'inventory', element: <InventoryPage /> },
-          { path: 'orders', element: <OrderPage />}
+          { path: 'orders', element: <OrderPage /> },
         ],
       },
       { path: 'profile', element: <ProfilePage /> },

@@ -50,9 +50,10 @@ export class CreateInventoryService implements BaseService {
         },
       });
       if (existing) {
-        throw new ValidationHandler(
-          { field: 'locationId', message: 'Inventory already exists for this product in this location'},
-        );
+        throw new ValidationHandler({
+          field: 'locationId',
+          message: 'Inventory already exists for this product in this location',
+        });
       }
 
       // Create inventory record

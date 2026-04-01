@@ -44,7 +44,9 @@ describe('CreateInventoryService', () => {
   };
 
   beforeEach(() => {
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
     container.registerInstance(CreateAuditLogService, auditService);
     service = container.resolve(CreateInventoryService);
     jest.clearAllMocks();
@@ -54,33 +56,44 @@ describe('CreateInventoryService', () => {
     const dto = { productId: 1, locationId: 1 };
 
     const managerMock = {
-      findOne: jest.fn()
-        .mockResolvedValueOnce(mockProduct)  // product check
+      findOne: jest
+        .fn()
+        .mockResolvedValueOnce(mockProduct) // product check
         .mockResolvedValueOnce(mockLocation) // location check
-        .mockResolvedValueOnce(null),        // existing inventory check
+        .mockResolvedValueOnce(null), // existing inventory check
       create: jest.fn().mockReturnValue(mockInventory),
       save: jest.fn().mockResolvedValue(mockInventory),
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
     const result = await service.handle(dto, user);
 
-    expect(managerMock.findOne).toHaveBeenNthCalledWith(1, Product, { where: { id: dto.productId } });
-    expect(managerMock.findOne).toHaveBeenNthCalledWith(2, Location, { where: { id: dto.locationId } });
-    expect(managerMock.findOne).toHaveBeenNthCalledWith(3, Inventory, { where: { productId: dto.productId, locationId: dto.locationId } });
+    expect(managerMock.findOne).toHaveBeenNthCalledWith(1, Product, {
+      where: { id: dto.productId },
+    });
+    expect(managerMock.findOne).toHaveBeenNthCalledWith(2, Location, {
+      where: { id: dto.locationId },
+    });
+    expect(managerMock.findOne).toHaveBeenNthCalledWith(3, Inventory, {
+      where: { productId: dto.productId, locationId: dto.locationId },
+    });
     expect(managerMock.create).toHaveBeenCalledWith(Inventory, {
       productId: dto.productId,
       locationId: dto.locationId,
       storedQuantity: 0,
     });
     expect(managerMock.save).toHaveBeenCalledWith(mockInventory);
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'INVENTORY_CREATED',
-      auditableType: 'Inventory',
-      auditableId: mockInventory.id,
-      userId: user.sub,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'INVENTORY_CREATED',
+        auditableType: 'Inventory',
+        auditableId: mockInventory.id,
+        userId: user.sub,
+      }),
+    );
     expect(result).toEqual(mockInventory);
   });
 
@@ -89,40 +102,54 @@ describe('CreateInventoryService', () => {
 
     const managerMock = { findOne: jest.fn().mockResolvedValueOnce(null) };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
-    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('should throw NotFoundException if location not found', async () => {
     const dto = { productId: 1, locationId: 999 };
 
     const managerMock = {
-      findOne: jest.fn()
+      findOne: jest
+        .fn()
         .mockResolvedValueOnce(mockProduct) // product exists
-        .mockResolvedValueOnce(null),       // location missing
+        .mockResolvedValueOnce(null), // location missing
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
-    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('should throw ValidationException if inventory already exists', async () => {
     const dto = { productId: 1, locationId: 1 };
 
     const managerMock = {
-      findOne: jest.fn()
-        .mockResolvedValueOnce(mockProduct)   // product exists
-        .mockResolvedValueOnce(mockLocation)  // location exists
+      findOne: jest
+        .fn()
+        .mockResolvedValueOnce(mockProduct) // product exists
+        .mockResolvedValueOnce(mockLocation) // location exists
         .mockResolvedValueOnce(mockInventory), // existing inventory
       create: jest.fn(),
       save: jest.fn(),
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
-    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(ValidationException);
+    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
     expect(managerMock.create).not.toHaveBeenCalled();
     expect(managerMock.save).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();

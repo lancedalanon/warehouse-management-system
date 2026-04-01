@@ -1,8 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateOrdersTable1771632532694 implements MigrationInterface {
-
-public async up(queryRunner: QueryRunner): Promise<void> {
+  public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE "orders" (
         "id" BIGSERIAL PRIMARY KEY,
@@ -25,5 +24,4 @@ public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE "orders"`);
     await queryRunner.query(`DROP TYPE order_status_enum`);
   }
-
 }

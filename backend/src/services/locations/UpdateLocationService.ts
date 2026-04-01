@@ -46,9 +46,10 @@ export class UpdateLocationService implements BaseService {
       });
 
       if (existing) {
-        throw new ValidationHandler(
-          { field: 'code', message: 'Location code was already assigned to another location'},
-        );
+        throw new ValidationHandler({
+          field: 'code',
+          message: 'Location code was already assigned to another location',
+        });
       }
     }
 

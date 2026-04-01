@@ -74,7 +74,7 @@ describe('LoginService', () => {
 
     await expect(service.handle(input)).rejects.toThrow(UnauthorizedException);
     expect(userRepo.findOne).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { email: input.email } })
+      expect.objectContaining({ where: { email: input.email } }),
     );
   });
 
@@ -85,7 +85,10 @@ describe('LoginService', () => {
     const input: LoginDTO = { email: mockUser.email, password: 'wrongpass' };
 
     await expect(service.handle(input)).rejects.toThrow(UnauthorizedException);
-    expect(bcrypt.compare).toHaveBeenCalledWith(input.password, mockUser.password);
+    expect(bcrypt.compare).toHaveBeenCalledWith(
+      input.password,
+      mockUser.password,
+    );
   });
 
   it('should throw ZodError if input is invalid', () => {
@@ -96,14 +99,21 @@ describe('LoginService', () => {
   it('should return user, accessToken, and refreshToken on successful login', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-    (RefreshTokenManager.generate as jest.Mock).mockReturnValue(mockRefreshData);
-    (refreshTokenRepo.create as jest.Mock).mockReturnValue({ ...mockRefreshData, isRevoked: false });
+    (RefreshTokenManager.generate as jest.Mock).mockReturnValue(
+      mockRefreshData,
+    );
+    (refreshTokenRepo.create as jest.Mock).mockReturnValue({
+      ...mockRefreshData,
+      isRevoked: false,
+    });
     (jwtService.generate as jest.Mock).mockReturnValue('access-token');
 
     const input: LoginDTO = { email: mockUser.email, password: 'correctpass' };
     const result = await service.handle(input);
 
-    expect(RefreshTokenManager.generate).toHaveBeenCalledWith({ userId: mockUser.id });
+    expect(RefreshTokenManager.generate).toHaveBeenCalledWith({
+      userId: mockUser.id,
+    });
     expect(refreshTokenRepo.create).toHaveBeenCalledWith({
       userId: mockRefreshData.userId,
       tokenHash: mockRefreshData.tokenHash,
@@ -113,11 +123,13 @@ describe('LoginService', () => {
       isRevoked: false,
     });
     expect(refreshTokenRepo.save).toHaveBeenCalled();
-    expect(jwtService.generate).toHaveBeenCalledWith(expect.objectContaining({
-      sub: mockUser.id,
-      email: mockUser.email,
-      roles: ['ADMIN'],
-    }));
+    expect(jwtService.generate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sub: mockUser.id,
+        email: mockUser.email,
+        roles: ['ADMIN'],
+      }),
+    );
 
     expect(result).toEqual({
       user: {
@@ -141,8 +153,13 @@ describe('LoginService', () => {
   it('should persist the refresh token entity', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-    (RefreshTokenManager.generate as jest.Mock).mockReturnValue(mockRefreshData);
-    (refreshTokenRepo.create as jest.Mock).mockReturnValue({ ...mockRefreshData, isRevoked: false });
+    (RefreshTokenManager.generate as jest.Mock).mockReturnValue(
+      mockRefreshData,
+    );
+    (refreshTokenRepo.create as jest.Mock).mockReturnValue({
+      ...mockRefreshData,
+      isRevoked: false,
+    });
     (jwtService.generate as jest.Mock).mockReturnValue('access-token');
 
     await service.handle({ email: mockUser.email, password: 'correctpass' });

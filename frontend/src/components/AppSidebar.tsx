@@ -14,7 +14,7 @@ import {
   MapPin,
   UserPlus,
   User,
-  Truck
+  Truck,
 } from 'lucide-react';
 
 import {

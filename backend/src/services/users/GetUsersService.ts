@@ -20,7 +20,7 @@ type SortKey = keyof typeof SORT_COLUMNS;
 
 @injectable()
 export class GetUsersService implements BaseService {
- constructor(
+  constructor(
     @inject('UserRepository')
     private readonly userRepo: Repository<User>,
   ) {}

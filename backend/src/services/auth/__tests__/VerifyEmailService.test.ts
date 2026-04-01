@@ -19,13 +19,16 @@ describe('VerifyEmailService', () => {
   } as unknown as User;
 
   beforeEach(() => {
-    userRepo = { findOne: jest.fn(), save: jest.fn() } as unknown as Repository<User>;
+    userRepo = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+    } as unknown as Repository<User>;
     emailVerifyService = { verify: jest.fn() };
 
     container.registerInstance('UserRepository', userRepo);
     container.registerInstance(
-        EmailVerifyService,
-        emailVerifyService as unknown as EmailVerifyService
+      EmailVerifyService,
+      emailVerifyService as unknown as EmailVerifyService,
     );
 
     service = container.resolve(VerifyEmailService);
@@ -37,20 +40,29 @@ describe('VerifyEmailService', () => {
   });
 
   it('should throw if token is invalid', async () => {
-    emailVerifyService.verify.mockImplementation(() => { throw new Error('Invalid token'); });
-    await expect(service.handle('invalidToken')).rejects.toThrow(BadRequestException);
+    emailVerifyService.verify.mockImplementation(() => {
+      throw new Error('Invalid token');
+    });
+    await expect(service.handle('invalidToken')).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw if user not found', async () => {
     emailVerifyService.verify.mockReturnValue({ email: 'notfound@test.com' });
     (userRepo.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(service.handle('validToken')).rejects.toThrow(UnauthorizedException);
+    await expect(service.handle('validToken')).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should return message if email is already verified', async () => {
     emailVerifyService.verify.mockReturnValue({ email: 'test@test.com' });
-    (userRepo.findOne as jest.Mock).mockResolvedValue({ ...mockUser, emailVerifiedAt: new Date() });
+    (userRepo.findOne as jest.Mock).mockResolvedValue({
+      ...mockUser,
+      emailVerifiedAt: new Date(),
+    });
 
     const result = await service.handle('validToken');
     expect(result).toEqual({ message: 'Email is already verified' });
@@ -63,7 +75,9 @@ describe('VerifyEmailService', () => {
 
     const result = await service.handle('validToken');
 
-    expect(userRepo.save).toHaveBeenCalledWith(expect.objectContaining({ emailVerifiedAt: expect.any(Date) }));
+    expect(userRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ emailVerifiedAt: expect.any(Date) }),
+    );
     expect(result).toEqual({ message: 'Email verified successfully' });
   });
 });

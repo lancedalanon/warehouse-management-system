@@ -37,7 +37,9 @@ describe('DeleteLocationService', () => {
       softRemove: jest.fn(),
     } as unknown as jest.Mocked<Repository<Location>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
 
     container.registerInstance('LocationRepository', locationRepo);
     container.registerInstance(CreateAuditLogService, auditService);
@@ -50,22 +52,26 @@ describe('DeleteLocationService', () => {
   it('should soft delete a location successfully', async () => {
     locationRepo.findOne.mockResolvedValue(existingLocation);
     locationRepo.softRemove.mockImplementation((l) =>
-      Promise.resolve({ ...existingLocation, ...l } as Location)
+      Promise.resolve({ ...existingLocation, ...l } as Location),
     );
 
     const result = await service.handle(existingLocation.id, user);
 
     // Repository calls
-    expect(locationRepo.findOne).toHaveBeenCalledWith({ where: { id: existingLocation.id } });
+    expect(locationRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingLocation.id },
+    });
     expect(locationRepo.softRemove).toHaveBeenCalledWith(existingLocation);
 
     // Audit log
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'LOCATION_DELETED',
-      auditableId: existingLocation.id,
-      userId: user.sub,
-      oldValues: existingLocation,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'LOCATION_DELETED',
+        auditableId: existingLocation.id,
+        userId: user.sub,
+        oldValues: existingLocation,
+      }),
+    );
 
     expect(result).toEqual(existingLocation);
   });
@@ -73,9 +79,7 @@ describe('DeleteLocationService', () => {
   it('should throw NotFoundException if location does not exist', async () => {
     locationRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, user))
-      .rejects
-      .toThrow(NotFoundException);
+    await expect(service.handle(999, user)).rejects.toThrow(NotFoundException);
 
     expect(locationRepo.softRemove).not.toHaveBeenCalled();
     expect(auditService.handle).not.toHaveBeenCalled();

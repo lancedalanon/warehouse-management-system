@@ -1,7 +1,6 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class RemoveReservedQuantityFromInventories1771632521898 implements MigrationInterface {
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropColumn('inventories', 'reserved_quantity');
   }
@@ -12,5 +11,4 @@ export class RemoveReservedQuantityFromInventories1771632521898 implements Migra
       ADD COLUMN "reserved_quantity" integer NOT NULL DEFAULT 0
     `);
   }
-
 }

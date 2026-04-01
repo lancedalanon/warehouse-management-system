@@ -50,9 +50,10 @@ export class UpdateUserService implements BaseService {
         where: { email: parsedData.email, id: Not(user.id) },
       });
       if (existingUser) {
-        throw new ValidationHandler(
-          { field: 'email', message: 'Email is already in use by another user'}
-        );
+        throw new ValidationHandler({
+          field: 'email',
+          message: 'Email is already in use by another user',
+        });
       }
       user.emailVerifiedAt = null; // reset verification if email changed
     }
@@ -62,14 +63,16 @@ export class UpdateUserService implements BaseService {
       where: { id: parsedData.roleId },
     });
     if (!role) {
-      throw new ValidationHandler(
-        { field: 'roleId', message: 'Selected role does not exist'}
-      );
+      throw new ValidationHandler({
+        field: 'roleId',
+        message: 'Selected role does not exist',
+      });
     }
     if (role.code === RoleEnum.SUPERADMIN) {
-      throw new ValidationHandler(
-        { field: 'roleId', message: 'Cannot assign SUPERADMIN role'}
-      );
+      throw new ValidationHandler({
+        field: 'roleId',
+        message: 'Cannot assign SUPERADMIN role',
+      });
     }
 
     // Apply updates

@@ -46,9 +46,10 @@ export class CreateUserService implements BaseService {
       where: { email: parsedData.email },
     });
     if (existingUser) {
-      throw new ValidationHandler(
-        { field: 'email', message: 'Email is already in use'}
-      );
+      throw new ValidationHandler({
+        field: 'email',
+        message: 'Email is already in use',
+      });
     }
 
     // Ensure role exists and is not SUPERADMIN
@@ -56,14 +57,16 @@ export class CreateUserService implements BaseService {
       where: { id: parsedData.roleId },
     });
     if (!role) {
-      throw new ValidationHandler(
-        { field: 'roleId', message: 'Selected role does not exist'}
-      );
+      throw new ValidationHandler({
+        field: 'roleId',
+        message: 'Selected role does not exist',
+      });
     }
     if (role.code === RoleEnum.SUPERADMIN) {
-      throw new ValidationHandler(
-        { field: 'roleId', message: 'Cannot assign SUPERADMIN role'}
-      );
+      throw new ValidationHandler({
+        field: 'roleId',
+        message: 'Cannot assign SUPERADMIN role',
+      });
     }
 
     // Generate random password and hash it

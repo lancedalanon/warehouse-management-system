@@ -64,9 +64,15 @@ describe('ChangeEmailService', () => {
 
     // Register all dependencies in tsyringe container
     container.registerInstance('UserRepository', userRepo);
-    container.registerInstance('InvitationRequestRepository', invitationRequestRepo);
+    container.registerInstance(
+      'InvitationRequestRepository',
+      invitationRequestRepo,
+    );
     container.registerInstance(EmailVerifyService, emailVerifyService);
-    container.registerInstance(VerifyEmailNotification, verifyEmailNotification);
+    container.registerInstance(
+      VerifyEmailNotification,
+      verifyEmailNotification,
+    );
 
     service = container.resolve(ChangeEmailService);
 
@@ -77,7 +83,10 @@ describe('ChangeEmailService', () => {
     const req = { user: null } as unknown as Request;
 
     await expect(
-      service.handle(req, { email: 'new@test.com', currentPassword: 'validpass' })
+      service.handle(req, {
+        email: 'new@test.com',
+        currentPassword: 'validpass',
+      }),
     ).rejects.toThrow(UnauthorizedException);
   });
 
@@ -85,7 +94,7 @@ describe('ChangeEmailService', () => {
     const req = { user: { sub: 1 } } as unknown as Request;
 
     await expect(
-      service.handle(req, { email: 'new@test.com', currentPassword: 'short' })
+      service.handle(req, { email: 'new@test.com', currentPassword: 'short' }),
     ).rejects.toThrow();
   });
 
@@ -94,7 +103,10 @@ describe('ChangeEmailService', () => {
     const req = { user: { sub: 1 } } as unknown as Request;
 
     await expect(
-      service.handle(req, { email: 'new@test.com', currentPassword: 'validpass' })
+      service.handle(req, {
+        email: 'new@test.com',
+        currentPassword: 'validpass',
+      }),
     ).rejects.toThrow(UnauthorizedException);
   });
 
@@ -105,24 +117,33 @@ describe('ChangeEmailService', () => {
     const req = { user: { sub: 1 } } as unknown as Request;
 
     await expect(
-      service.handle(req, { email: 'new@test.com', currentPassword: 'validpass' })
+      service.handle(req, {
+        email: 'new@test.com',
+        currentPassword: 'validpass',
+      }),
     ).rejects.toThrow(UnauthorizedException);
   });
 
   it('should throw ValidationException if email already exists', async () => {
-    (userRepo.findOne as jest.Mock).mockImplementation((options: FindOneOptions<User>) => {
-      const where = options.where as Partial<User>;
-      if (where?.id === 1) return Promise.resolve(mockUser); // current user
-      if (where?.email === 'new@test.com') return Promise.resolve({ id: 2 } as User); // duplicate
-      return Promise.resolve(null);
-    });
+    (userRepo.findOne as jest.Mock).mockImplementation(
+      (options: FindOneOptions<User>) => {
+        const where = options.where as Partial<User>;
+        if (where?.id === 1) return Promise.resolve(mockUser); // current user
+        if (where?.email === 'new@test.com')
+          return Promise.resolve({ id: 2 } as User); // duplicate
+        return Promise.resolve(null);
+      },
+    );
 
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     const req = { user: { sub: 1 } } as unknown as Request;
 
     await expect(
-      service.handle(req, { email: 'new@test.com', currentPassword: 'validpass' })
+      service.handle(req, {
+        email: 'new@test.com',
+        currentPassword: 'validpass',
+      }),
     ).rejects.toThrow(ValidationException);
   });
 
@@ -131,23 +152,46 @@ describe('ChangeEmailService', () => {
       .mockResolvedValueOnce(mockUser) // fetch current user
       .mockResolvedValueOnce(null); // check for duplicate
 
-    (invitationRequestRepo.findOne as jest.Mock).mockResolvedValue(mockInvitation);
+    (invitationRequestRepo.findOne as jest.Mock).mockResolvedValue(
+      mockInvitation,
+    );
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-    (emailVerifyService.generate as jest.Mock).mockReturnValue('verification-token');
+    (emailVerifyService.generate as jest.Mock).mockReturnValue(
+      'verification-token',
+    );
 
-    (invitationRequestRepo.save as jest.Mock).mockResolvedValue({ ...mockInvitation, userId: null });
-    (userRepo.save as jest.Mock).mockResolvedValue({ ...mockUser, email: 'new@test.com', emailVerifiedAt: null });
+    (invitationRequestRepo.save as jest.Mock).mockResolvedValue({
+      ...mockInvitation,
+      userId: null,
+    });
+    (userRepo.save as jest.Mock).mockResolvedValue({
+      ...mockUser,
+      email: 'new@test.com',
+      emailVerifiedAt: null,
+    });
 
     const req = { user: { sub: 1 } } as unknown as Request;
 
-    const result = await service.handle(req, { email: 'new@test.com', currentPassword: 'validpass' });
+    const result = await service.handle(req, {
+      email: 'new@test.com',
+      currentPassword: 'validpass',
+    });
 
-    expect(invitationRequestRepo.save).toHaveBeenCalledWith(expect.objectContaining({ userId: null }));
-    expect(userRepo.save).toHaveBeenCalledWith(expect.objectContaining({ email: 'new@test.com', emailVerifiedAt: null }));
-    expect(emailVerifyService.generate).toHaveBeenCalledWith({ email: 'new@test.com' });
+    expect(invitationRequestRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: null }),
+    );
+    expect(userRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'new@test.com', emailVerifiedAt: null }),
+    );
+    expect(emailVerifyService.generate).toHaveBeenCalledWith({
+      email: 'new@test.com',
+    });
     expect(verifyEmailNotification.send).toHaveBeenCalledWith(
       'new@test.com',
-      expect.objectContaining({ firstName: 'John', verifyUrl: expect.stringContaining('verification-token') })
+      expect.objectContaining({
+        firstName: 'John',
+        verifyUrl: expect.stringContaining('verification-token'),
+      }),
     );
 
     expect(result.email).toBe('new@test.com');

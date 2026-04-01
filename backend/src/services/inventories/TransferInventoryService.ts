@@ -15,7 +15,7 @@ export class TransferInventoryService {
   constructor(
     @inject(CreateAuditLogService)
     private readonly createAuditLogService: CreateAuditLogService,
-    
+
     @inject(CreateInventoryMovementService)
     private readonly createInventoryMovementService: CreateInventoryMovementService,
 
@@ -34,9 +34,10 @@ export class TransferInventoryService {
     const { locationId, transferredQuantity, notes } = data;
 
     if (!locationId || locationId <= 0) {
-      throw new ValidationHandler(
-        { field: 'locationId', message: 'Target location is required for transfer'},
-      );
+      throw new ValidationHandler({
+        field: 'locationId',
+        message: 'Target location is required for transfer',
+      });
     }
 
     // Validate that target location exists
@@ -50,15 +51,17 @@ export class TransferInventoryService {
     }
 
     if (!transferredQuantity || transferredQuantity <= 0) {
-      throw new ValidationHandler(
-        { field: 'transferredQuantity', message: 'Transferred quantity must be greater than 0'},
-      );
+      throw new ValidationHandler({
+        field: 'transferredQuantity',
+        message: 'Transferred quantity must be greater than 0',
+      });
     }
 
     if (transferredQuantity > inventory.storedQuantity) {
-      throw new ValidationHandler(
-        { field: 'transferredQuantity', message: `Transferred quantity (${transferredQuantity}) cannot exceed stored quantity (${inventory.storedQuantity})`},
-      );
+      throw new ValidationHandler({
+        field: 'transferredQuantity',
+        message: `Transferred quantity (${transferredQuantity}) cannot exceed stored quantity (${inventory.storedQuantity})`,
+      });
     }
 
     // Update old source to decrease quantity

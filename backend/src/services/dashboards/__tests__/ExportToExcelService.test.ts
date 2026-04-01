@@ -10,7 +10,6 @@ import { GetInventoryAgingService } from '../GetInventoryAgingService';
 import { GetStockVelocityService } from '../GetStockVelocityService';
 import { GetWarehouseRiskService } from '../GetWarehouseRiskService';
 
-
 jest.mock('@/lib/PdfRenderer', () => ({
   PdfRenderer: jest.fn().mockImplementation(() => ({
     render: jest.fn().mockResolvedValue(Buffer.from('pdf')),
@@ -19,7 +18,9 @@ jest.mock('@/lib/PdfRenderer', () => ({
 
 jest.mock('@/lib/FileStorageHandler', () => ({
   FileStorageHandler: {
-    save: jest.fn().mockResolvedValue({ url: 'https://example.com/report.pdf' }),
+    save: jest
+      .fn()
+      .mockResolvedValue({ url: 'https://example.com/report.pdf' }),
   },
 }));
 
@@ -34,13 +35,17 @@ describe('ExportToExcelService', () => {
   beforeEach(() => {
     // Mocks that DO NOT touch database
     const mockDashboardService = {
-        handle: jest.fn().mockResolvedValue({
-            inventoryStatuses: [{ status: 'ok', count: 10 }],
-            recentMovements: [{ item: 'A', qty: 5 }],
-        }),
+      handle: jest.fn().mockResolvedValue({
+        inventoryStatuses: [{ status: 'ok', count: 10 }],
+        recentMovements: [{ item: 'A', qty: 5 }],
+      }),
     } as unknown as GetDashboardDataService;
-    const mockNetStockService = { handle: jest.fn().mockResolvedValue({ stock: 100 }) };
-    const mockTopMoversService = { handle: jest.fn().mockResolvedValue({ movers: [] }) };
+    const mockNetStockService = {
+      handle: jest.fn().mockResolvedValue({ stock: 100 }),
+    };
+    const mockTopMoversService = {
+      handle: jest.fn().mockResolvedValue({ movers: [] }),
+    };
     const mockAgingService = {
       handle: jest.fn().mockResolvedValue({
         days_0_7: 10,
@@ -50,8 +55,12 @@ describe('ExportToExcelService', () => {
         total: 15,
       }),
     };
-    const mockVelocityService = { handle: jest.fn().mockResolvedValue({ velocity: [] }) };
-    const mockRiskService = { handle: jest.fn().mockResolvedValue({ risk: [] }) };
+    const mockVelocityService = {
+      handle: jest.fn().mockResolvedValue({ velocity: [] }),
+    };
+    const mockRiskService = {
+      handle: jest.fn().mockResolvedValue({ risk: [] }),
+    };
 
     container.registerInstance(GetDashboardDataService, mockDashboardService);
     container.registerInstance(GetNetStockService, mockNetStockService);

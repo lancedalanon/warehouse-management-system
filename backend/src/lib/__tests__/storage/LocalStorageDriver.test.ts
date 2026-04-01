@@ -30,12 +30,12 @@ describe('LocalStorageDriver', () => {
 
     expect(mockedFs.mkdirSync).toHaveBeenCalledWith(
       path.dirname(expectedFullPath),
-      { recursive: true }
+      { recursive: true },
     );
 
     expect(mockedFs.writeFileSync).toHaveBeenCalledWith(
       expectedFullPath,
-      buffer
+      buffer,
     );
 
     expect(result).toEqual({
@@ -75,7 +75,7 @@ describe('LocalStorageDriver', () => {
     expect(result.url).toBe('/storage/uploads/image.png');
     expect(mockedFs.writeFileSync).toHaveBeenCalledWith(
       expectedFullPath,
-      buffer
+      buffer,
     );
   });
 });

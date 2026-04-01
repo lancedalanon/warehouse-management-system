@@ -40,9 +40,15 @@ describe('ForgotPasswordService', () => {
       send: jest.fn(),
     } as unknown as ForgotPasswordEmailNotification;
 
-    container.registerInstance('PasswordRequestRepository', passwordRequestRepo);
+    container.registerInstance(
+      'PasswordRequestRepository',
+      passwordRequestRepo,
+    );
     container.registerInstance('UserRepository', userRepo);
-    container.registerInstance(ForgotPasswordEmailNotification, forgotPasswordEmailNotification);
+    container.registerInstance(
+      ForgotPasswordEmailNotification,
+      forgotPasswordEmailNotification,
+    );
 
     service = container.resolve(ForgotPasswordService);
 
@@ -52,8 +58,9 @@ describe('ForgotPasswordService', () => {
   it('should throw if user does not exist', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(service.handle({ email: 'nonexistent@test.com' }))
-      .rejects.toThrow(ConflictException);
+    await expect(
+      service.handle({ email: 'nonexistent@test.com' }),
+    ).rejects.toThrow(ConflictException);
   });
 
   it('should create a new password request if none exists', async () => {
@@ -63,35 +70,45 @@ describe('ForgotPasswordService', () => {
 
     const result = await service.handle({ email: 'test@test.com' });
 
-    expect(passwordRequestRepo.create).toHaveBeenCalledWith(expect.objectContaining({
-      email: 'test@test.com',
-      token: expect.any(String),
-    }));
+    expect(passwordRequestRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'test@test.com',
+        token: expect.any(String),
+      }),
+    );
     expect(passwordRequestRepo.save).toHaveBeenCalled();
     expect(forgotPasswordEmailNotification.send).toHaveBeenCalledWith(
       'test@test.com',
       expect.objectContaining({
         firstName: 'John',
         resetUrl: expect.stringContaining('token='),
-      })
+      }),
     );
-    expect(result).toEqual({ message: 'Password reset requested, please check your email!' });
+    expect(result).toEqual({
+      message: 'Password reset requested, please check your email!',
+    });
   });
 
   it('should update existing password request if it exists', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
-    (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue(mockPasswordRequest);
+    (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue(
+      mockPasswordRequest,
+    );
     (passwordRequestRepo.save as jest.Mock).mockResolvedValue(true);
 
     const result = await service.handle({ email: 'test@test.com' });
 
     expect(passwordRequestRepo.create).not.toHaveBeenCalled();
-    expect(passwordRequestRepo.save).toHaveBeenCalledWith(expect.objectContaining({
-      email: 'test@test.com',
-      token: expect.any(String),
-      usedAt: null,
-    }));
-    expect(result).toEqual({ message: 'Password reset requested, please check your email!' });
+    expect(passwordRequestRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'test@test.com',
+        token: expect.any(String),
+        usedAt: null,
+      }),
+    );
+    expect(result).toEqual({
+      message: 'Password reset requested, please check your email!',
+    });
   });
 
   it('should call email notification with correct parameters', async () => {
@@ -106,7 +123,7 @@ describe('ForgotPasswordService', () => {
       expect.objectContaining({
         firstName: 'John',
         resetUrl: expect.stringContaining('token='),
-      })
+      }),
     );
   });
 });

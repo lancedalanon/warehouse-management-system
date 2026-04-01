@@ -8,7 +8,7 @@ import { RefreshTokenManager } from '@/lib/RefreshTokenManager';
 export class LogoutService {
   constructor(
     @inject('RefreshTokenRepository')
-    private readonly refreshTokenRepo: Repository<RefreshToken>
+    private readonly refreshTokenRepo: Repository<RefreshToken>,
   ) {}
 
   async handle(refreshTokenString: string) {

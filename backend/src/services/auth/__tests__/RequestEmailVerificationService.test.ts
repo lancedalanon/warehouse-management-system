@@ -37,7 +37,10 @@ describe('RequestEmailVerificationService', () => {
 
     container.registerInstance('UserRepository', userRepo);
     container.registerInstance(EmailVerifyService, emailVerifyService);
-    container.registerInstance(VerifyEmailNotification, verifyEmailNotification);
+    container.registerInstance(
+      VerifyEmailNotification,
+      verifyEmailNotification,
+    );
 
     service = container.resolve(RequestEmailVerificationService);
 
@@ -47,13 +50,16 @@ describe('RequestEmailVerificationService', () => {
   it('should throw if user not found', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(
-      service.handle({ email: 'unknown@test.com' })
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(service.handle({ email: 'unknown@test.com' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should return message if email already verified', async () => {
-    (userRepo.findOne as jest.Mock).mockResolvedValue({ ...mockUser, emailVerifiedAt: new Date() });
+    (userRepo.findOne as jest.Mock).mockResolvedValue({
+      ...mockUser,
+      emailVerifiedAt: new Date(),
+    });
 
     const result = await service.handle({ email: 'test@test.com' });
 
@@ -65,10 +71,15 @@ describe('RequestEmailVerificationService', () => {
 
     const result = await service.handle({ email: 'test@test.com' });
 
-    expect(emailVerifyService.generate).toHaveBeenCalledWith({ email: 'test@test.com' });
+    expect(emailVerifyService.generate).toHaveBeenCalledWith({
+      email: 'test@test.com',
+    });
     expect(verifyEmailNotification.send).toHaveBeenCalledWith(
       'test@test.com',
-      expect.objectContaining({ firstName: 'John', verifyUrl: expect.stringContaining('token123') })
+      expect.objectContaining({
+        firstName: 'John',
+        verifyUrl: expect.stringContaining('token123'),
+      }),
     );
     expect(result).toEqual({ message: 'Verification email sent successfully' });
   });

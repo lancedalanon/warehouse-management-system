@@ -40,7 +40,10 @@ describe('ChangePasswordService', () => {
     } as unknown as Repository<User>;
 
     // Register in tsyringe
-    container.registerInstance('PasswordRequestRepository', passwordRequestRepo);
+    container.registerInstance(
+      'PasswordRequestRepository',
+      passwordRequestRepo,
+    );
     container.registerInstance('UserRepository', userRepo);
 
     service = container.resolve(ChangePasswordService);
@@ -50,27 +53,49 @@ describe('ChangePasswordService', () => {
 
   const buildReq = (overrides?: Partial<Request>): Request =>
     ({
-      query: { email: 'test@test.com', token: 'token123', ...(overrides?.query ?? {}) },
-      body: { password: 'newpass123', confirmPassword: 'newpass123', ...(overrides?.body ?? {}) },
-    } as unknown as Request);
+      query: {
+        email: 'test@test.com',
+        token: 'token123',
+        ...(overrides?.query ?? {}),
+      },
+      body: {
+        password: 'newpass123',
+        confirmPassword: 'newpass123',
+        ...(overrides?.body ?? {}),
+      },
+    }) as unknown as Request;
 
   it('should throw if request not found', async () => {
     (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(service.handle(buildReq())).rejects.toThrow(BadRequestException);
+    await expect(service.handle(buildReq())).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw if token already used', async () => {
-    (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue({ ...mockRequest, usedAt: new Date() });
+    (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue({
+      ...mockRequest,
+      usedAt: new Date(),
+    });
 
-    await expect(service.handle(buildReq())).rejects.toThrow('This token has already been used');
+    await expect(service.handle(buildReq())).rejects.toThrow(
+      'This token has already been used',
+    );
   });
 
   it('should throw if token expired', async () => {
-    const expiredRequest = { ...mockRequest, createdAt: new Date(Date.now() - 16 * 60 * 1000) };
-    (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue(expiredRequest);
+    const expiredRequest = {
+      ...mockRequest,
+      createdAt: new Date(Date.now() - 16 * 60 * 1000),
+    };
+    (passwordRequestRepo.findOne as jest.Mock).mockResolvedValue(
+      expiredRequest,
+    );
 
-    await expect(service.handle(buildReq())).rejects.toThrow('Password reset token has expired');
+    await expect(service.handle(buildReq())).rejects.toThrow(
+      'Password reset token has expired',
+    );
   });
 
   it('should throw if user not found', async () => {
@@ -88,8 +113,12 @@ describe('ChangePasswordService', () => {
     const result = await service.handle(buildReq());
 
     expect(bcrypt.hash).toHaveBeenCalledWith('newpass123', 10);
-    expect(userRepo.save).toHaveBeenCalledWith(expect.objectContaining({ password: 'hashedNewPassword' }));
-    expect(passwordRequestRepo.save).toHaveBeenCalledWith(expect.objectContaining({ usedAt: expect.any(Date) }));
+    expect(userRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ password: 'hashedNewPassword' }),
+    );
+    expect(passwordRequestRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ usedAt: expect.any(Date) }),
+    );
     expect(result).toEqual({ message: 'Password changed successfully' });
   });
 });

@@ -32,7 +32,9 @@ describe('GetLocationService', () => {
 
     const result = await service.handle(existingLocation.id);
 
-    expect(locationRepo.findOne).toHaveBeenCalledWith({ where: { id: existingLocation.id } });
+    expect(locationRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingLocation.id },
+    });
     expect(result).toEqual(existingLocation);
   });
 

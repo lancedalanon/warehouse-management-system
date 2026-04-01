@@ -16,7 +16,7 @@ export class UpdateInventoryService implements BaseService {
   constructor(
     @inject(StoreInventoryService)
     private readonly storeInventoryService: StoreInventoryService,
-    
+
     @inject(TransferInventoryService)
     private readonly transferService: TransferInventoryService,
 

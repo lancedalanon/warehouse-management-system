@@ -6,8 +6,16 @@ export class SeedRolesAndUserAccounts1769861944921 implements MigrationInterface
   public async up(queryRunner: QueryRunner): Promise<void> {
     const roles = [
       { name: 'Super Admin', code: Role.SUPERADMIN, userName: 'Super Admin' },
-      { name: 'Warehouse Manager', code: Role.WAREHOUSE_MANAGER, userName: 'Warehouse Manager' },
-      { name: 'Inventory Staff', code: Role.INVENTORY_STAFF, userName: 'Inventory Staff' },
+      {
+        name: 'Warehouse Manager',
+        code: Role.WAREHOUSE_MANAGER,
+        userName: 'Warehouse Manager',
+      },
+      {
+        name: 'Inventory Staff',
+        code: Role.INVENTORY_STAFF,
+        userName: 'Inventory Staff',
+      },
       { name: 'Auditor', code: Role.AUDITOR, userName: 'Auditor Account' },
     ];
 
@@ -16,7 +24,7 @@ export class SeedRolesAndUserAccounts1769861944921 implements MigrationInterface
     for (const r of roles) {
       // --- Check if role exists ---
       const roleRes = await queryRunner.query(
-        `SELECT id FROM roles WHERE code = '${r.code}'`
+        `SELECT id FROM roles WHERE code = '${r.code}'`,
       );
 
       let roleId: number;
@@ -40,7 +48,7 @@ export class SeedRolesAndUserAccounts1769861944921 implements MigrationInterface
 
       // --- Check if user exists ---
       const userRes = await queryRunner.query(
-        `SELECT id FROM users WHERE email = '${email}'`
+        `SELECT id FROM users WHERE email = '${email}'`,
       );
 
       let userId: number;

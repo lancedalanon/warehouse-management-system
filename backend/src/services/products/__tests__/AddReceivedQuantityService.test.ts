@@ -40,12 +40,19 @@ describe('AddReceivedQuantityService', () => {
       save: jest.fn(),
     } as unknown as jest.Mocked<Repository<Product>>;
 
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
-    inventoryMovementService = { handle: jest.fn() } as unknown as jest.Mocked<CreateInventoryMovementService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
+    inventoryMovementService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateInventoryMovementService>;
 
     container.registerInstance('ProductRepository', productRepo);
     container.registerInstance(CreateAuditLogService, auditService);
-    container.registerInstance(CreateInventoryMovementService, inventoryMovementService);
+    container.registerInstance(
+      CreateInventoryMovementService,
+      inventoryMovementService,
+    );
 
     service = container.resolve(AddReceivedQuantityService);
 
@@ -57,32 +64,40 @@ describe('AddReceivedQuantityService', () => {
 
     productRepo.findOne.mockResolvedValue(existingProduct);
     productRepo.save.mockImplementation((p) =>
-        Promise.resolve({
-            ...existingProduct,
-            ...p,
-        } as Product)
+      Promise.resolve({
+        ...existingProduct,
+        ...p,
+      } as Product),
     );
 
     const result = await service.handle(existingProduct.id, dto, user);
 
     // Product find and save
-    expect(productRepo.findOne).toHaveBeenCalledWith({ where: { id: existingProduct.id } });
-    expect(productRepo.save).toHaveBeenCalledWith(expect.objectContaining({ receivedQuantity: 15 }));
+    expect(productRepo.findOne).toHaveBeenCalledWith({
+      where: { id: existingProduct.id },
+    });
+    expect(productRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ receivedQuantity: 15 }),
+    );
 
     // Inventory movement
-    expect(inventoryMovementService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      productId: existingProduct.id,
-      quantity: dto.quantity,
-      fromState: InventoryStatus.EXTERNAL,
-      toState: InventoryStatus.RECEIVED,
-    }));
+    expect(inventoryMovementService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        productId: existingProduct.id,
+        quantity: dto.quantity,
+        fromState: InventoryStatus.EXTERNAL,
+        toState: InventoryStatus.RECEIVED,
+      }),
+    );
 
     // Audit log
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'PRODUCT_RECEIVED',
-      auditableId: existingProduct.id,
-      userId: user.sub,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'PRODUCT_RECEIVED',
+        auditableId: existingProduct.id,
+        userId: user.sub,
+      }),
+    );
 
     expect(result.receivedQuantity).toBe(15);
   });
@@ -90,9 +105,9 @@ describe('AddReceivedQuantityService', () => {
   it('should throw NotFoundException if product does not exist', async () => {
     productRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.handle(999, { quantity: 5 }, user))
-      .rejects
-      .toThrow(NotFoundException);
+    await expect(service.handle(999, { quantity: 5 }, user)).rejects.toThrow(
+      NotFoundException,
+    );
 
     expect(productRepo.save).not.toHaveBeenCalled();
     expect(inventoryMovementService.handle).not.toHaveBeenCalled();

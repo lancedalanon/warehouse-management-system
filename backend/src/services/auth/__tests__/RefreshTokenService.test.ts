@@ -55,10 +55,14 @@ describe('RefreshTokenService', () => {
   });
 
   it('should throw if refresh token is invalid', async () => {
-    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue('hashed-token');
+    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue(
+      'hashed-token',
+    );
     (refreshTokenRepo.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(service.handle('some-token')).rejects.toThrow(UnauthorizedException);
+    await expect(service.handle('some-token')).rejects.toThrow(
+      UnauthorizedException,
+    );
     expect(refreshTokenRepo.findOne).toHaveBeenCalledWith({
       where: { tokenHash: 'hashed-token', isRevoked: false },
       relations: ['user', 'user.roles'],
@@ -66,15 +70,24 @@ describe('RefreshTokenService', () => {
   });
 
   it('should throw if refresh token is expired', async () => {
-    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue('hashed-token');
-    const expiredToken = { ...mockTokenEntry, expiredAt: new Date(Date.now() - 1000) };
+    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue(
+      'hashed-token',
+    );
+    const expiredToken = {
+      ...mockTokenEntry,
+      expiredAt: new Date(Date.now() - 1000),
+    };
     (refreshTokenRepo.findOne as jest.Mock).mockResolvedValue(expiredToken);
 
-    await expect(service.handle('some-token')).rejects.toThrow(UnauthorizedException);
+    await expect(service.handle('some-token')).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should return user and accessToken on valid token', async () => {
-    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue('hashed-token');
+    (RefreshTokenManager.fingerprint as jest.Mock).mockReturnValue(
+      'hashed-token',
+    );
     (refreshTokenRepo.findOne as jest.Mock).mockResolvedValue(mockTokenEntry);
     (jwtService.generate as jest.Mock).mockReturnValue('access-token');
 
@@ -85,11 +98,11 @@ describe('RefreshTokenService', () => {
         sub: mockUser.id,
         email: mockUser.email,
         roles: ['ADMIN'],
-      })
+      }),
     );
 
     expect(refreshTokenRepo.save).toHaveBeenCalledWith(
-      expect.objectContaining({ lastUsedAt: expect.any(Date) })
+      expect.objectContaining({ lastUsedAt: expect.any(Date) }),
     );
 
     expect(result).toEqual({

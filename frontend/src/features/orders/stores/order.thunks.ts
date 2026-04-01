@@ -3,12 +3,7 @@ import type { AxiosError } from 'axios';
 import type { ApiResponse, ValidationErrorItem } from '@/types/api.types';
 import type { PaginationMeta } from '@/types/pagination.types';
 
-import {
-  getOrdersApi,
-  getOrderApi,
-  createOrderApi,
-  updateOrderApi,
-} from '@/apis/order.apis';
+import { getOrdersApi, getOrderApi, createOrderApi, updateOrderApi } from '@/apis/order.apis';
 
 import type {
   Order,
@@ -27,27 +22,22 @@ export const getOrdersThunk = createAsyncThunk<
     return await getOrdersApi(params);
   } catch (error) {
     const err = error as AxiosError<ApiResponse>;
-    return rejectWithValue(
-      err.response?.data?.message ?? 'Failed to fetch orders',
-    );
+    return rejectWithValue(err.response?.data?.message ?? 'Failed to fetch orders');
   }
 });
 
 /* GET ORDER */
-export const getOrderThunk = createAsyncThunk<
-  Order,
-  number | string,
-  { rejectValue: string }
->('orders/getOne', async (id, { rejectWithValue }) => {
-  try {
-    return await getOrderApi(id);
-  } catch (error) {
-    const err = error as AxiosError<ApiResponse>;
-    return rejectWithValue(
-      err.response?.data?.message ?? 'Failed to fetch order',
-    );
-  }
-});
+export const getOrderThunk = createAsyncThunk<Order, number | string, { rejectValue: string }>(
+  'orders/getOne',
+  async (id, { rejectWithValue }) => {
+    try {
+      return await getOrderApi(id);
+    } catch (error) {
+      const err = error as AxiosError<ApiResponse>;
+      return rejectWithValue(err.response?.data?.message ?? 'Failed to fetch order');
+    }
+  },
+);
 
 /* CREATE */
 export const createOrderThunk = createAsyncThunk<
@@ -58,8 +48,7 @@ export const createOrderThunk = createAsyncThunk<
   try {
     return await createOrderApi(payload);
   } catch (error) {
-    const err =
-      error as AxiosError<ApiResponse<null, null, ValidationErrorItem[]>>;
+    const err = error as AxiosError<ApiResponse<null, null, ValidationErrorItem[]>>;
 
     const data = err.response?.data;
 
@@ -80,8 +69,7 @@ export const updateOrderThunk = createAsyncThunk<
   try {
     return await updateOrderApi(id, payload);
   } catch (error) {
-    const err =
-      error as AxiosError<ApiResponse<null, null, ValidationErrorItem[]>>;
+    const err = error as AxiosError<ApiResponse<null, null, ValidationErrorItem[]>>;
 
     const data = err.response?.data;
 

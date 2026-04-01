@@ -61,10 +61,12 @@ describe('CreateOrderService', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,
-  } as unknown as Order; 
+  } as unknown as Order;
 
   beforeEach(() => {
-    auditService = { handle: jest.fn() } as unknown as jest.Mocked<CreateAuditLogService>;
+    auditService = {
+      handle: jest.fn(),
+    } as unknown as jest.Mocked<CreateAuditLogService>;
     container.registerInstance(CreateAuditLogService, auditService);
     service = container.resolve(CreateOrderService);
     jest.clearAllMocks();
@@ -72,33 +74,33 @@ describe('CreateOrderService', () => {
 
   it('should create an order successfully', async () => {
     const dto: CreateOrderDTO = {
-        code: 'ORD001',
-        status: OrderStatus.PENDING,
-        recipientName: 'John Doe',
-        shippingAddress: '123 Street',
-        contactNumber: null,
-        priorityLevel: OrderPriority.MEDIUM,
-        expectedPickupDate: null,
-        notes: null,
-        items: [{ inventorySourceId: 1, quantity: 5 }],
+      code: 'ORD001',
+      status: OrderStatus.PENDING,
+      recipientName: 'John Doe',
+      shippingAddress: '123 Street',
+      contactNumber: null,
+      priorityLevel: OrderPriority.MEDIUM,
+      expectedPickupDate: null,
+      notes: null,
+      items: [{ inventorySourceId: 1, quantity: 5 }],
     };
 
     const managerMock = {
       getRepository: jest.fn((entity) => {
         if (entity === Order) {
-            return {
-                findOne: jest.fn().mockImplementation(({ where }) => {
-                if (where.code) return null; // for duplicate code check
-                if (where.id) return Promise.resolve(mockOrder); // for reloading after save
-                return null;
-                }),
-                create: jest.fn().mockReturnValue(mockOrder),
-                save: jest.fn().mockResolvedValue(mockOrder),
-            };
+          return {
+            findOne: jest.fn().mockImplementation(({ where }) => {
+              if (where.code) return null; // for duplicate code check
+              if (where.id) return Promise.resolve(mockOrder); // for reloading after save
+              return null;
+            }),
+            create: jest.fn().mockReturnValue(mockOrder),
+            save: jest.fn().mockResolvedValue(mockOrder),
+          };
         }
         if (entity === OrderItem) {
           return {
-            create: jest.fn().mockImplementation(item => item),
+            create: jest.fn().mockImplementation((item) => item),
             save: jest.fn().mockResolvedValue(dto.items),
           };
         }
@@ -110,31 +112,35 @@ describe('CreateOrderService', () => {
       }),
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
     const result = await service.handle(dto, user);
 
     expect(managerMock.getRepository).toHaveBeenCalledWith(Order);
     expect(managerMock.getRepository).toHaveBeenCalledWith(OrderItem);
     expect(managerMock.getRepository).toHaveBeenCalledWith(Inventory);
-    expect(auditService.handle).toHaveBeenCalledWith(expect.objectContaining({
-      event: 'ORDER_CREATED',
-      userId: user.sub,
-    }));
+    expect(auditService.handle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'ORDER_CREATED',
+        userId: user.sub,
+      }),
+    );
     expect(result).toEqual(expect.objectContaining({ id: 1, code: 'ORD001' }));
   });
 
   it('should throw ValidationException if order code already exists', async () => {
     const dto: CreateOrderDTO = {
-        code: 'ORD001',
-        status: OrderStatus.PENDING, // optional but TS needs it
-        recipientName: 'John Doe',
-        shippingAddress: '123 Street',
-        contactNumber: null, // optional
-        priorityLevel: OrderPriority.MEDIUM, // optional
-        expectedPickupDate: null, // optional
-        notes: null, // optional
-        items: [{ inventorySourceId: 1, quantity: 5 }],
+      code: 'ORD001',
+      status: OrderStatus.PENDING, // optional but TS needs it
+      recipientName: 'John Doe',
+      shippingAddress: '123 Street',
+      contactNumber: null, // optional
+      priorityLevel: OrderPriority.MEDIUM, // optional
+      expectedPickupDate: null, // optional
+      notes: null, // optional
+      items: [{ inventorySourceId: 1, quantity: 5 }],
     };
 
     const managerMock = {
@@ -146,28 +152,36 @@ describe('CreateOrderService', () => {
       }),
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
-    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(ValidationException);
+    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
   });
 
   it('should throw ValidationException if inventory not found', async () => {
     const dto: CreateOrderDTO = {
-        code: 'ORD001',
-        status: OrderStatus.PENDING, // optional but TS needs it
-        recipientName: 'John Doe',
-        shippingAddress: '123 Street',
-        contactNumber: null, // optional
-        priorityLevel: OrderPriority.MEDIUM, // optional
-        expectedPickupDate: null, // optional
-        notes: null, // optional
-        items: [{ inventorySourceId: 1, quantity: 5 }],
+      code: 'ORD001',
+      status: OrderStatus.PENDING, // optional but TS needs it
+      recipientName: 'John Doe',
+      shippingAddress: '123 Street',
+      contactNumber: null, // optional
+      priorityLevel: OrderPriority.MEDIUM, // optional
+      expectedPickupDate: null, // optional
+      notes: null, // optional
+      items: [{ inventorySourceId: 1, quantity: 5 }],
     };
 
     const managerMock = {
       getRepository: jest.fn((entity) => {
         if (entity === Order) {
-          return { findOne: jest.fn().mockResolvedValue(null), create: jest.fn(), save: jest.fn() };
+          return {
+            findOne: jest.fn().mockResolvedValue(null),
+            create: jest.fn(),
+            save: jest.fn(),
+          };
         }
         if (entity === Inventory) {
           return { find: jest.fn().mockResolvedValue([]) };
@@ -178,28 +192,36 @@ describe('CreateOrderService', () => {
       }),
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
-    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(ValidationException);
+    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
   });
 
   it('should throw ValidationException if insufficient stock', async () => {
     const dto: CreateOrderDTO = {
-        code: 'ORD001',
-        status: OrderStatus.PENDING, // optional but TS needs it
-        recipientName: 'John Doe',
-        shippingAddress: '123 Street',
-        contactNumber: null, // optional
-        priorityLevel: OrderPriority.MEDIUM, // optional
-        expectedPickupDate: null, // optional
-        notes: null, // optional
-        items: [{ inventorySourceId: 1, quantity: 5 }],
+      code: 'ORD001',
+      status: OrderStatus.PENDING, // optional but TS needs it
+      recipientName: 'John Doe',
+      shippingAddress: '123 Street',
+      contactNumber: null, // optional
+      priorityLevel: OrderPriority.MEDIUM, // optional
+      expectedPickupDate: null, // optional
+      notes: null, // optional
+      items: [{ inventorySourceId: 1, quantity: 5 }],
     };
 
     const managerMock = {
       getRepository: jest.fn((entity) => {
         if (entity === Order) {
-          return { findOne: jest.fn().mockResolvedValue(null), create: jest.fn(), save: jest.fn() };
+          return {
+            findOne: jest.fn().mockResolvedValue(null),
+            create: jest.fn(),
+            save: jest.fn(),
+          };
         }
         if (entity === Inventory) {
           return { find: jest.fn().mockResolvedValue([mockInventoryLowStock]) };
@@ -210,8 +232,12 @@ describe('CreateOrderService', () => {
       }),
     };
 
-    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) => fn(managerMock));
+    (AppDataSource.transaction as jest.Mock).mockImplementation(async (fn) =>
+      fn(managerMock),
+    );
 
-    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(ValidationException);
+    await expect(service.handle(dto, user)).rejects.toBeInstanceOf(
+      ValidationException,
+    );
   });
 });

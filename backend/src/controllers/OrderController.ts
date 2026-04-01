@@ -47,22 +47,13 @@ export class OrderController extends BaseController {
   }
 
   async getOrder(req: Request, res: Response) {
-    const result = await this.getOrderService.handle(
-      Number(req.params.id),
-    );
+    const result = await this.getOrderService.handle(Number(req.params.id));
 
-    ResponseHandler.success(
-      res,
-      'Order retrieved successfully',
-      result,
-    );
+    ResponseHandler.success(res, 'Order retrieved successfully', result);
   }
 
   async createOrder(req: Request, res: Response) {
-    const result = await this.createOrderService.handle(
-      req.body,
-      req.user,
-    );
+    const result = await this.createOrderService.handle(req.body, req.user);
 
     ResponseHandler.success(
       res,
@@ -80,22 +71,12 @@ export class OrderController extends BaseController {
       req.user,
     );
 
-    ResponseHandler.success(
-      res,
-      'Order updated successfully',
-      result,
-    );
+    ResponseHandler.success(res, 'Order updated successfully', result);
   }
 
   async deleteOrder(req: Request, res: Response) {
-    await this.deleteOrderService.handle(
-      Number(req.params.id),
-      req.user,
-    );
+    await this.deleteOrderService.handle(Number(req.params.id), req.user);
 
-    ResponseHandler.success(
-      res,
-      'Order deleted successfully',
-    );
+    ResponseHandler.success(res, 'Order deleted successfully');
   }
 }

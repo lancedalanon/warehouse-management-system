@@ -58,9 +58,9 @@ const OrderPage: FC = () => {
 
   const columns: TableColumn<Order>[] = [
     { key: 'code', header: 'Order Code', sortable: true },
-    { 
-      key: 'status', 
-      header: 'Status', 
+    {
+      key: 'status',
+      header: 'Status',
       sortable: true,
       className: 'capitalize',
     },

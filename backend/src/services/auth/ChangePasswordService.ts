@@ -15,7 +15,7 @@ export class ChangePasswordService {
     private readonly passwordRequestRepo: Repository<PasswordRequest>,
 
     @inject('UserRepository')
-    private readonly userRepo: Repository<User>
+    private readonly userRepo: Repository<User>,
   ) {}
 
   async handle(req: Request) {

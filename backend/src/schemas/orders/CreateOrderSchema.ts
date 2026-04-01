@@ -35,11 +35,10 @@ export const CreateOrderSchema = z
         },
       ),
 
-    expectedPickupDate: z
-      .preprocess(
-        (val) => (val ? new Date(val as string) : undefined),
-        z.date().nullable().default(null),
-      ),
+    expectedPickupDate: z.preprocess(
+      (val) => (val ? new Date(val as string) : undefined),
+      z.date().nullable().default(null),
+    ),
     notes: z.string().nullable().default(null),
 
     items: z

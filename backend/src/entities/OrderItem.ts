@@ -33,7 +33,6 @@ export class OrderItem {
   @ManyToOne(() => Inventory, (inventory) => inventory.orderItems, {
     onDelete: 'RESTRICT',
   })
-  
   @JoinColumn({ name: 'inventory_source_id' })
   inventorySource!: Inventory;
 

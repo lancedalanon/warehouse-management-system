@@ -1,11 +1,7 @@
 import type { BaseListParams } from '@/types/api.types';
 import type { Inventory } from '@/features/inventories/types/inventory.types';
 
-export type OrderStatus =
-  | 'pending'
-  | 'completed'
-  | 'cancelled'
-  | 'confirmed';
+export type OrderStatus = 'pending' | 'completed' | 'cancelled' | 'confirmed';
 
 export type OrderPriority = 'low' | 'medium' | 'high';
 

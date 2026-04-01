@@ -32,15 +32,24 @@ describe('RequestInvitationService', () => {
   } as unknown as User;
 
   beforeEach(() => {
-    invitationRepo = { findOne: jest.fn(), save: jest.fn(), create: jest.fn() } as unknown as Repository<InvitationRequest>;
+    invitationRepo = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn(),
+    } as unknown as Repository<InvitationRequest>;
     userRepo = { findOne: jest.fn() } as unknown as Repository<User>;
 
-    emailNotification = { send: jest.fn() } as unknown as RequestInvitationSentEmailNotification;
+    emailNotification = {
+      send: jest.fn(),
+    } as unknown as RequestInvitationSentEmailNotification;
     createUserService = { handle: jest.fn() } as unknown as CreateUserService;
 
     container.registerInstance('InvitationRequestRepository', invitationRepo);
     container.registerInstance('UserRepository', userRepo);
-    container.registerInstance(RequestInvitationSentEmailNotification, emailNotification);
+    container.registerInstance(
+      RequestInvitationSentEmailNotification,
+      emailNotification,
+    );
     container.registerInstance(CreateUserService, createUserService);
 
     service = container.resolve(RequestInvitationService);
@@ -51,16 +60,28 @@ describe('RequestInvitationService', () => {
   it('should throw if user already exists', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
 
-    await expect(service.handle({ email: 'existing@test.com', firstName: 'John', lastName: 'Doe', roleId: 1 }))
-      .rejects.toThrow(ConflictException);
+    await expect(
+      service.handle({
+        email: 'existing@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        roleId: 1,
+      }),
+    ).rejects.toThrow(ConflictException);
   });
 
   it('should throw if invitation already sent and not declined', async () => {
     (userRepo.findOne as jest.Mock).mockResolvedValue(null);
     (invitationRepo.findOne as jest.Mock).mockResolvedValue(mockInvitation);
 
-    await expect(service.handle({ email: 'invite@test.com', firstName: 'John', lastName: 'Doe', roleId: 1 }))
-      .rejects.toThrow(BadRequestException);
+    await expect(
+      service.handle({
+        email: 'invite@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        roleId: 1,
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('should update invitation if declined and send email', async () => {
@@ -68,7 +89,12 @@ describe('RequestInvitationService', () => {
     const declinedInvitation = { ...mockInvitation, declinedAt: new Date() };
     (invitationRepo.findOne as jest.Mock).mockResolvedValue(declinedInvitation);
 
-    await service.handle({ email: 'invite@test.com', firstName: 'John', lastName: 'Doe', roleId: 1 });
+    await service.handle({
+      email: 'invite@test.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      roleId: 1,
+    });
 
     expect(invitationRepo.save).toHaveBeenCalled();
     expect(emailNotification.send).toHaveBeenCalledWith('invite@test.com');
@@ -80,7 +106,12 @@ describe('RequestInvitationService', () => {
     (invitationRepo.findOne as jest.Mock).mockResolvedValue(null);
     (invitationRepo.create as jest.Mock).mockImplementation((data) => data);
 
-    await service.handle({ email: 'new@test.com', firstName: 'Jane', lastName: 'Doe', roleId: 2 });
+    await service.handle({
+      email: 'new@test.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
+      roleId: 2,
+    });
 
     expect(invitationRepo.create).toHaveBeenCalled();
     expect(invitationRepo.save).toHaveBeenCalled();

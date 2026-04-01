@@ -12,6 +12,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || 'test',
   password: process.env.DB_PASSWORD || 'test',
   database: process.env.DB_NAME || 'test',
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   entities: [path.join(__dirname, 'entities', '*.{ts,js}')],
   migrations: [path.join(__dirname, 'migrations', '*.{ts,js}')],
   synchronize: false,
