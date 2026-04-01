@@ -48,8 +48,8 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 # Ensure backend/storage exists
 RUN mkdir -p ./storage && chmod -R 777 ./storage
 
-# Copy entrypoint
-COPY entrypoint.sh /entrypoint.sh
+# Copy entrypoint from backend folder in context
+COPY backend/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 3000
