@@ -1,0 +1,128 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Invitation Accepted</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, Arial, sans-serif;
+        background-color: #ffffff; /* var(--background) neutral light */
+        color: #1c1c1e; /* var(--foreground) neutral light */
+      }
+      .container {
+        width: 100%;
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff; /* var(--card) */
+        border-radius: 10px; /* var(--radius-lg) */
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #ffffff; /* var(--card) */
+        color: #1c1c1e; /* var(--card-foreground) */
+        padding: 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .content {
+        padding: 30px 20px;
+        line-height: 1.6;
+        font-size: 16px;
+        color: #1c1c1e; /* var(--card-foreground) */
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 25px;
+        margin: 20px 0;
+        background-color: #3366ff; /* var(--primary) */
+        color: #ffffff !important; /* var(--primary-foreground) */
+        font-weight: bold;
+        text-align: center;
+        border-radius: 8px; /* var(--radius-md) */
+        text-decoration: none;
+      }
+      .credentials {
+        background-color: #f5f5f5; /* var(--muted) */
+        color: #555555; /* var(--muted-foreground) */
+        padding: 15px;
+        border-radius: 8px; /* var(--radius-md) */
+        margin: 15px 0;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .fallback-link {
+        word-break: break-all;
+        font-size: 14px;
+        color: #3366ff; /* var(--primary) */
+      }
+      .footer {
+        padding: 20px;
+        font-size: 12px;
+        color: #555555; /* var(--muted-foreground) */
+        text-align: center;
+      }
+      @media (max-width: 600px) {
+        .container {
+          width: 95% !important;
+        }
+        .content {
+          padding: 20px 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>Your Invitation Has Been Accepted!</div>
+      <div class='content'>
+        <p>Hello {{firstName}},</p>
+        <p>
+          Your invitation to
+          <strong>{{appName}}</strong>
+          has been accepted! You can now access your account using the temporary
+          credentials below:
+        </p>
+
+        <div class='credentials'>
+          Email:
+          {{email}}<br />
+          Temporary Password:
+          {{password}}
+        </div>
+
+        <p style='text-align: center;'>
+          <a href='{{loginUrl}}' class='button'>Login Now</a>
+        </p>
+
+        <p style='text-align: center; font-size: 14px; color: #555555;'>
+          If the button above doesn’t work, copy and paste the following link
+          into your browser:
+        </p>
+
+        <p class='fallback-link' style='text-align: center;'>
+          <a
+            href='{{loginUrl}}'
+            style='color: #3366ff; text-decoration: underline;'
+          >{{loginUrl}}</a>
+        </p>
+
+        <p>
+          <strong>Note:</strong>
+          This is a temporary password. Please reset your password after logging
+          in for security.
+        </p>
+      </div>
+
+      <div class='footer'>
+        &copy;
+        {{year}}
+        {{appName}}. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>

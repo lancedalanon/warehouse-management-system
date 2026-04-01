@@ -1,0 +1,172 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+  </head>
+  <body>
+
+    <!-- HEADER -->
+    <table width='100%' cellpadding='6' cellspacing='0' border='1'>
+      <tr>
+        <td width='70%'>
+          <h2>Warehouse Performance Report</h2>
+          <p>Period: {{meta.dateRange}}</p>
+        </td>
+        <td align='right' valign='top'>
+          <p>Generated {{meta.generatedAt}}</p>
+          <p>{{meta.generatedBy}}</p>
+        </td>
+      </tr>
+    </table>
+
+    <br />
+
+    <!-- KPI ROW -->
+    <p><strong>Summary</strong>
+      &mdash; Key movement figures for the selected period.</p>
+    <table
+      style='width: 100%; table-layout: fixed; min-width: 500px; border-collapse: collapse;'
+      cellpadding='6'
+      cellspacing='0'
+      border='1'
+    >
+      <tr bgcolor='#F0F0F0' width='100%'>
+        <th align='center'>Inbound Qty</th>
+        <th align='center'>Outbound Qty</th>
+        <th align='center'>Net Stock Change</th>
+        <th align='center'>Avg Inbound / Day</th>
+      </tr>
+      <tr width='100%'>
+        <td align='center'><big><strong
+            >{{data.netStock.inbound}}</strong></big><br /><small>This period</small></td>
+        <td align='center'><big><strong
+            >{{data.netStock.outbound}}</strong></big><br /><small>This period</small></td>
+        <td align='center'><big><strong
+            >{{data.netStock.netStock}}</strong></big><br /><small>Inbound
+            &minus; Outbound</small></td>
+        <td align='center'><big><strong
+            >{{data.velocity.avgInboundPerDay}}</strong></big><br /><small>Units
+            per working day</small></td>
+      </tr>
+    </table>
+
+    <br />
+
+    <!-- INVENTORY STATUS -->
+    <p><strong>Inventory Status Per Action</strong>
+      &mdash; Current stock broken down by action type as of period end.</p>
+    <table
+      style='width: 100%; table-layout: fixed; min-width: 500px; border-collapse: collapse;'
+      cellpadding='6'
+      cellspacing='0'
+      border='1'
+    >
+      <tr bgcolor='#F0F0F0'>
+        <th align='left'>Status</th>
+        <th align='right'>Units</th>
+      </tr>
+      {{#each data.statusSummary}}
+        <tr>
+          <td>{{this.type}}</td>
+          <td align='right'>{{this.count}}</td>
+        </tr>
+      {{/each}}
+    </table>
+
+    <!-- INVENTORY AGING -->
+    <p><strong>Inventory Aging</strong>
+      &mdash; Age profile of current stock showing how long units have been held
+      in the warehouse.</p>
+    <table
+      style='width: 100%; table-layout: fixed; min-width: 500px; border-collapse: collapse;'
+      cellpadding='6'
+      cellspacing='0'
+      border='1'
+    >
+      <tr bgcolor='#F0F0F0'>
+        <th align='left'>Age Bracket</th>
+        <th align='right'>Units</th>
+      </tr>
+      <tr><td>0&ndash;7 days</td><td
+          align='right'
+        >{{data.aging.days_0_7}}</td></tr>
+      <tr><td>8&ndash;30 days</td><td
+          align='right'
+        >{{data.aging.days_8_30}}</td></tr>
+      <tr><td>31&ndash;90 days</td><td
+          align='right'
+        >{{data.aging.days_31_90}}</td></tr>
+      <tr><td>90+ days</td><td
+          align='right'
+        >{{data.aging.days_90_plus}}</td></tr>
+    </table>
+
+    <!-- TOP MOVERS -->
+    <p><strong>Top Moving Products</strong>
+      &mdash; Ranked by total throughput (inbound + outbound) for the period.</p>
+    <table width='100%' cellpadding='6' cellspacing='0' border='1'>
+      <tr bgcolor='#F0F0F0'>
+        <th align='left'>SKU</th>
+        <th align='left'>Product</th>
+        <th align='right'>Inbound</th>
+        <th align='right'>Outbound</th>
+        <th align='right'>Net</th>
+        <th align='center'>Activity</th>
+      </tr>
+      {{#each data.topMovers}}
+        <tr>
+          <td><small>{{this.sku}}</small></td>
+          <td>{{this.name}}</td>
+          <td align='right'>{{this.inbound}}</td>
+          <td align='right'>{{this.outbound}}</td>
+          <td align='right'>
+            <strong>
+              {{#if this.netPositive}}+{{this.net}}{{/if}}
+              {{#if this.netNegative}}{{this.net}}{{/if}}
+              {{#if this.netZero}}{{this.net}}{{/if}}
+            </strong>
+          </td>
+          <td align='center'>
+            {{#if this.activityHigh}}High{{/if}}
+            {{#if this.activityMedium}}Medium{{/if}}
+            {{#if this.activityLow}}Low{{/if}}
+          </td>
+        </tr>
+      {{/each}}
+    </table>
+
+    <!-- RISKS -->
+    {{#if data.risk.hasWrittenOff}}
+      <blockquote><p><strong>&#9888; Written-Off Stock Detected</strong>
+          &mdash; Written-off stock detected in inventory. Review disposal
+          procedures and ensure compliance with write-off policies.</p></blockquote>
+    {{/if}}
+
+    {{#if data.risk.noOutbound}}
+      <blockquote><p><strong>&#9888; No Outbound Shipments</strong>
+          &mdash; No outbound shipments were recorded for this period. Verify
+          that fulfillment operations are active and that no shipments were
+          missed.</p></blockquote>
+    {{/if}}
+
+    {{#if data.risk.inventoryGrowing}}
+      <blockquote><p><strong>&#9888; Accumulation Risk</strong>
+          &mdash; Inventory is growing faster than it is leaving the warehouse.
+          Monitor stock levels closely to avoid capacity or spoilage issues.</p></blockquote>
+    {{/if}}
+
+    <hr />
+
+    <!-- FOOTER -->
+    <table width='100%' cellpadding='4' cellspacing='0' border='0'>
+      <tr>
+        <td><small>Warehouse Performance Report &middot;
+            {{meta.dateRange}}
+            &middot; Confidential</small></td>
+        <td align='right'><small>{{meta.generatedBy}}
+            &middot;
+            {{meta.generatedAt}}</small></td>
+      </tr>
+    </table>
+
+  </body>
+</html>

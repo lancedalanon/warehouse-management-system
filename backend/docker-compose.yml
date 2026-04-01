@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  warehouse-management-system-backend:
+    container_name: warehouse-management-system-backend
+    image: warehouse-management-system-backend
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '${PORT}:3000'
+    volumes:
+      - .:/app
+      - ./storage:/app/storage
+      - /app/node_modules
+    env_file:
+      - .env
+    command: npm run dev
+    restart: unless-stopped
