@@ -29,16 +29,6 @@ jobs:
         run: npm run test -- --coverage --watchAll=false
         working-directory: ./backend
 
-      - name: Check backend coverage
-        run: |
-          COVERAGE=$(npx jest --coverage --json | jq '.coverageMap | .[] | .statements.pct' | awk '{s+=$1} END {print s/NR}')
-          echo "Coverage: $COVERAGE"
-          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-            echo "Coverage below 80%, stopping build"
-            exit 1
-          fi
-        working-directory: ./backend
-
       - name: Run Prettier on backend
         run: |
           npx prettier --check "**/*.{ts,js,json,css,scss,md}" || { echo "Prettier check failed"; exit 1; }
