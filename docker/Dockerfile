@@ -70,7 +70,7 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 RUN mkdir -p storage && chmod -R 777 storage
 
 # Entrypoint
-COPY entrypoint.sh /entrypoint.sh
+COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 3000
