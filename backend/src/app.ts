@@ -56,7 +56,12 @@ if (fs.existsSync(frontendDistDir)) {
   app.use(express.static(frontendDistDir));
 
   app.get(/^(?!\/api|\/storage).*/, (_req, res) =>
-    res.sendFile('index.html', { root: frontendDistDir }),
+    res.sendFile('index.html', { root: frontendDistDir }, (err) => {
+      if (err) {
+        console.error('sendFile error:', err);
+        res.status(500).send('Failed to serve frontend');
+      }
+    }),
   );
 } else {
   app.get('/', (_req, res) => res.send('OK'));

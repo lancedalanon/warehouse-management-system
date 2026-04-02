@@ -49,21 +49,18 @@ RUN npm run build
 # -----------------------------
 FROM node:22-bullseye-slim
 
-# Put backend and frontend together to match local structure
 WORKDIR /app
 
-# Backend runtime
+# Backend runtime — keep everything at /app level
 COPY --from=backend-builder /app/backend/dist ./dist
 COPY --from=backend-deps /app/backend/node_modules ./node_modules
-COPY backend/package*.json ./backend/package.json
+COPY backend/package.json ./package.json
 
-# Frontend build (must be relative to backend/dist for ../../frontend/dist)
+# Frontend dist — /app/frontend/dist matches process.cwd() + 'frontend/dist'
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Storage directory
 RUN mkdir -p storage && chmod -R 777 storage
 
-# Entrypoint
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
