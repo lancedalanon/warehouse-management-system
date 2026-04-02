@@ -52,16 +52,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 if (fs.existsSync(frontendDistDir)) {
+  app.use('/assets', express.static(path.join(frontendDistDir, 'assets')));
   app.use(express.static(frontendDistDir));
 
-  // Fallback for React Router (exclude /api and /storage)
   app.get(/^(?!\/api|\/storage).*/, (_req, res) =>
-    res.sendFile('index.html', { root: frontendDistDir }, (err) => {
-      if (err) {
-        console.error('Failed to send index.html:', err);
-        res.status(500).send('Internal Server Error');
-      }
-    }),
+    res.sendFile('index.html', { root: frontendDistDir }),
   );
 } else {
   app.get('/', (_req, res) => res.send('OK'));
