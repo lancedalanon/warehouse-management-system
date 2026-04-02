@@ -42,24 +42,26 @@ app.use(express.json());
 app.use(cookieParser());
 
 let frontendDistDir: string;
-let frontendIndexHtml: string;
 
 if (process.env.NODE_ENV === 'development') {
   // Local dev path
   frontendDistDir = path.resolve(__dirname, '../../frontend/dist');
-  frontendIndexHtml = path.join(frontendDistDir, 'index.html');
 } else {
   // Docker / production path
   frontendDistDir = path.resolve(process.cwd(), 'frontend/dist');
-  frontendIndexHtml = path.join(frontendDistDir, 'index.html');
 }
 
-// Serve React frontend if it exists
 if (fs.existsSync(frontendDistDir)) {
   app.use(express.static(frontendDistDir));
+
   // Fallback for React Router (exclude /api and /storage)
   app.get(/^(?!\/api|\/storage).*/, (_req, res) =>
-    res.sendFile(frontendIndexHtml),
+    res.sendFile('index.html', { root: frontendDistDir }, (err) => {
+      if (err) {
+        console.error('Failed to send index.html:', err);
+        res.status(500).send('Internal Server Error');
+      }
+    }),
   );
 } else {
   app.get('/', (_req, res) => res.send('OK'));
