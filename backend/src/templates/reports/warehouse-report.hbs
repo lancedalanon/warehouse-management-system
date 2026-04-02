@@ -103,6 +103,7 @@
     <!-- TOP MOVERS -->
     <p><strong>Top Moving Products</strong>
       &mdash; Ranked by total throughput (inbound + outbound) for the period.</p>
+
     <table width='100%' cellpadding='6' cellspacing='0' border='1'>
       <tr bgcolor='#F0F0F0'>
         <th align='left'>SKU</th>
@@ -112,6 +113,7 @@
         <th align='right'>Net</th>
         <th align='center'>Activity</th>
       </tr>
+
       {{#each data.topMovers}}
         <tr>
           <td><small>{{this.sku}}</small></td>
@@ -131,7 +133,14 @@
             {{#if this.activityLow}}Low{{/if}}
           </td>
         </tr>
+      {{else}}
+        <tr>
+          <td colspan="6" align="center">
+            <em>No product movement recorded for this period.</em>
+          </td>
+        </tr>
       {{/each}}
+
     </table>
 
     <!-- RISKS -->
