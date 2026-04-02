@@ -183,6 +183,7 @@ router.get(
     Role.SUPERADMIN,
     Role.INVENTORY_STAFF,
     Role.WAREHOUSE_MANAGER,
+    Role.AUDITOR,
   ]),
   orderController.getOrders,
 );
@@ -217,6 +218,7 @@ router.get(
     Role.SUPERADMIN,
     Role.INVENTORY_STAFF,
     Role.WAREHOUSE_MANAGER,
+    Role.AUDITOR,
   ]),
   orderController.getOrder,
 );
