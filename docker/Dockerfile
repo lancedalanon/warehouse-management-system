@@ -56,7 +56,8 @@ COPY --from=backend-builder /app/backend/dist ./dist
 COPY --from=backend-deps /app/backend/node_modules ./node_modules
 COPY backend/package*.json ./
 
-# Frontend static files (adjusted path)
+# Frontend static files
+# Copy it under /app/frontend/dist to match backend code expectation
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Storage directory
