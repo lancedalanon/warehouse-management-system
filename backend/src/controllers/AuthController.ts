@@ -61,10 +61,8 @@ export class AuthController extends BaseController {
 
     res.cookie('refreshToken', result.refreshToken.token, {
       httpOnly: true,
-      secure:
-        process.env.NODE_ENV === 'production' ||
-        process.env.NODE_ENV === 'staging',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
       maxAge: result.refreshToken.expiredAt.getTime() - Date.now(),
     });
 
@@ -98,10 +96,8 @@ export class AuthController extends BaseController {
 
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure:
-        process.env.NODE_ENV === 'production' ||
-        process.env.NODE_ENV === 'staging',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
     });
 
     ResponseHandler.success(res, 'Logout successfully');
