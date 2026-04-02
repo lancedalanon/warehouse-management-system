@@ -41,23 +41,27 @@ app.set('query parser', (str: string) => qs.parse(str, { allowDots: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Serve React frontend if it exists
-const frontendDistDir = path.resolve(__dirname, '../../frontend/dist');
-const frontendIndexHtml = path.join(frontendDistDir, 'index.html');
+let frontendDistDir: string;
+let frontendIndexHtml: string;
 
+if (process.env.NODE_ENV === 'development') {
+  // Local dev path
+  frontendDistDir = path.resolve(__dirname, '../../frontend/dist');
+  frontendIndexHtml = path.join(frontendDistDir, 'index.html');
+} else {
+  // Docker / production path
+  frontendDistDir = path.resolve(process.cwd(), 'frontend/dist');
+  frontendIndexHtml = path.join(frontendDistDir, 'index.html');
+}
+
+// Serve React frontend if it exists
 if (fs.existsSync(frontendDistDir)) {
   app.use(express.static(frontendDistDir));
-
-  // Fallback for React Router paths (exclude /api and /storage)
-  app.get(/^(?!\/api|\/storage).*/, (_req, res) => {
-    res.sendFile(frontendIndexHtml);
-  });
+  // Fallback for React Router (exclude /api and /storage)
+  app.get(/^(?!\/api|\/storage).*/, (_req, res) => res.sendFile(frontendIndexHtml));
 } else {
   app.get('/', (_req, res) => res.send('OK'));
 }
-
-// Storage route
-app.use('/storage', express.static(path.resolve(__dirname, '../storage')));
 
 // Swagger docs
 if (process.env.NODE_ENV !== 'production') {
