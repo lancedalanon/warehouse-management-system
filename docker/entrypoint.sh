@@ -3,22 +3,23 @@ set -e
 
 echo "Starting backend container..."
 
-# Optionally wait for database availability
-# echo "Waiting for Postgres..."
-# until pg_isready -h $DB_HOST -p $DB_PORT; do
-#   sleep 1
-# done
+echo "Waiting for database..."
 
-# Run TypeORM migrations
+until node -e "
+const { Client } = require('pg');
+const client = new Client({ connectionString: process.env.DATABASE_URL, ssl:{rejectUnauthorized:false}});
+client.connect().then(()=>process.exit(0)).catch(()=>process.exit(1));
+"
+do
+  echo "Database not ready..."
+  sleep 2
+done
+
 echo "Running migrations..."
-npm run db:migrate || true
+node ./node_modules/typeorm/cli.js migration:run -d dist/data-source.js || true
 
-# Run seeders if you have any
-# npx ts-node ./src/seeders/seed.ts || true
-
-# Ensure storage folder exists and is writable
 mkdir -p /app/storage
 chmod -R 777 /app/storage
 
-# Start the backend
+echo "Starting server..."
 exec node dist/index.js
