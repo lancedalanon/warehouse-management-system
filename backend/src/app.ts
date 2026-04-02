@@ -41,35 +41,16 @@ app.set('query parser', (str: string) => qs.parse(str, { allowDots: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-let frontendDistDir: string;
+// Path to storage directory
+const storagePath = path.resolve(process.cwd(), 'storage');
 
-if (process.env.NODE_ENV === 'development') {
-  // Local dev path
-  frontendDistDir = path.resolve(__dirname, '../../frontend/dist');
-} else {
-  // Docker / production path
-  frontendDistDir = path.resolve(process.cwd(), 'frontend/dist');
+// Ensure folder exists (optional safety)
+if (!fs.existsSync(storagePath)) {
+  fs.mkdirSync(storagePath, { recursive: true });
 }
 
-if (fs.existsSync(frontendDistDir)) {
-  console.log('Serving frontend from:', frontendDistDir);
-
-  app.use('/assets', express.static(path.join(frontendDistDir, 'assets')));
-  app.use(express.static(frontendDistDir));
-
-  app.get(/^(?!\/api|\/storage).*/, (_req, res) =>
-    res.sendFile('index.html', { root: frontendDistDir }, (err) => {
-      if (err) {
-        console.error('sendFile error:', err);
-        res.status(500).send('Failed to serve frontend');
-      }
-    }),
-  );
-} else {
-  console.warn('Frontend dist NOT found at:', frontendDistDir);
-
-  app.get('/', (_req, res) => res.send('OK'));
-}
+// Serve storage files
+app.use('/storage', express.static(storagePath));
 
 // Swagger docs
 if (process.env.NODE_ENV !== 'production') {
@@ -78,6 +59,11 @@ if (process.env.NODE_ENV !== 'production') {
 
 // API routes
 app.use('/api', routes);
+
+// Health check endpoint
+app.get('/', (_req, res) => {
+  res.status(200).send('OK');
+});
 
 // Global exception handler
 app.use(globalExceptionHandler);
