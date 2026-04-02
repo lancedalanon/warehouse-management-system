@@ -58,7 +58,9 @@ if (process.env.NODE_ENV === 'development') {
 if (fs.existsSync(frontendDistDir)) {
   app.use(express.static(frontendDistDir));
   // Fallback for React Router (exclude /api and /storage)
-  app.get(/^(?!\/api|\/storage).*/, (_req, res) => res.sendFile(frontendIndexHtml));
+  app.get(/^(?!\/api|\/storage).*/, (_req, res) =>
+    res.sendFile(frontendIndexHtml),
+  );
 } else {
   app.get('/', (_req, res) => res.send('OK'));
 }
