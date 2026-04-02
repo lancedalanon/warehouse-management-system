@@ -6,9 +6,7 @@ FROM node:22-bullseye-slim AS backend-deps
 WORKDIR /app/backend
 
 COPY backend/package*.json ./
-
 RUN npm ci
-
 
 # -----------------------------
 # Stage 2: Backend build
@@ -18,10 +16,8 @@ FROM node:22-bullseye-slim AS backend-builder
 WORKDIR /app/backend
 
 COPY --from=backend-deps /app/backend/node_modules ./node_modules
-COPY backend/ .
-
+COPY backend/ ./
 RUN npm run build
-
 
 # -----------------------------
 # Stage 3: Frontend dependencies
@@ -31,9 +27,7 @@ FROM node:22-bullseye-slim AS frontend-deps
 WORKDIR /app/frontend
 
 COPY frontend/package*.json ./
-
 RUN npm ci
-
 
 # -----------------------------
 # Stage 4: Frontend build
@@ -43,13 +37,12 @@ FROM node:22-bullseye-slim AS frontend-builder
 WORKDIR /app/frontend
 
 COPY --from=frontend-deps /app/frontend/node_modules ./node_modules
-COPY frontend/ .
+COPY frontend/ ./
 
 ARG VITE_API_BASE_URL
 RUN echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" > .env
 
 RUN npm run build
-
 
 # -----------------------------
 # Stage 5: Runtime
@@ -63,8 +56,8 @@ COPY --from=backend-builder /app/backend/dist ./dist
 COPY --from=backend-deps /app/backend/node_modules ./node_modules
 COPY backend/package*.json ./
 
-# Frontend static files
-COPY --from=frontend-builder /app/frontend/dist ./public
+# Frontend static files (adjusted path)
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Storage directory
 RUN mkdir -p storage && chmod -R 777 storage
