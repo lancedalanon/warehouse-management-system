@@ -52,6 +52,8 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 if (fs.existsSync(frontendDistDir)) {
+  console.log('Serving frontend from:', frontendDistDir);
+
   app.use('/assets', express.static(path.join(frontendDistDir, 'assets')));
   app.use(express.static(frontendDistDir));
 
@@ -64,6 +66,8 @@ if (fs.existsSync(frontendDistDir)) {
     }),
   );
 } else {
+  console.warn('Frontend dist NOT found at:', frontendDistDir);
+
   app.get('/', (_req, res) => res.send('OK'));
 }
 
