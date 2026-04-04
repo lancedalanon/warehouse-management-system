@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
+import 'dotenv/config';
 
 export type MailDeliveryType = 'smtp' | 'api';
 export type MailApiProviderType = 'brevo';

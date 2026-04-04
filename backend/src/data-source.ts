@@ -1,9 +1,7 @@
 import { DataSource } from 'typeorm';
-import dotenv from 'dotenv';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import path from 'path';
-
-dotenv.config();
+import 'dotenv/config';
 
 // Determine if we should use DATABASE_URL (Supabase / hosted)
 const useDatabaseUrl = Boolean(process.env.DATABASE_URL);

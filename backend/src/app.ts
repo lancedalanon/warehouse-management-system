@@ -4,15 +4,13 @@ import express from 'express';
 import qs from 'qs';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import routes from '@/routes';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from '@/swagger';
 import { globalExceptionHandler } from '@/middlewares/exception.middleware';
 import fs from 'fs';
 import path from 'path';
-
-dotenv.config();
+import 'dotenv/config';
 
 const app = express();
 
