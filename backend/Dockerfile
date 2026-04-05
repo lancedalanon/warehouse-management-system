@@ -1,49 +1,46 @@
 # -----------------------------
-# Stage 1: Dependencies
+# Stage 1: Build
 # -----------------------------
-FROM node:22-bullseye-slim AS deps
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev
 
-# -----------------------------
-# Stage 2: Build
-# -----------------------------
-FROM node:22-bullseye-slim AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
+
 RUN npm run build
 
+# remove dev dependencies
+RUN npm prune --omit=dev
+
+
 # -----------------------------
-# Stage 3: Runtime
+# Stage 2: Runtime
 # -----------------------------
-FROM node:22-bullseye-slim AS runtime
+FROM node:22-alpine
 
 ENV NODE_ENV=production
 
 WORKDIR /app
 
-# Only production node_modules
-COPY --from=deps /app/node_modules ./node_modules
+# copy production node_modules
+COPY --from=builder /app/node_modules ./node_modules
 
-# Compiled output
+# copy compiled output
 COPY --from=builder /app/dist ./dist
 
-# Minimal package.json (needed for module resolution)
 COPY package.json ./package.json
-
-# Persistent storage directory
-RUN mkdir -p storage && chmod -R 777 storage
-
 COPY entrypoint.sh /entrypoint.sh
+
 RUN chmod +x /entrypoint.sh
 
+# storage dir
+RUN mkdir -p /app/storage
+
 EXPOSE 3000
+
 ENTRYPOINT ["/entrypoint.sh"]
